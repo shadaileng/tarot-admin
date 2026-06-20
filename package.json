@@ -1,6 +1,6 @@
 {
   "name": "tarot-admin",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "塔罗牌后台管理面板 — 查看和管理 tarot-backend 服务",
   "private": true,
   "packageManager": "pnpm@9.15.0",
@@ -9,7 +9,7 @@
     "dev": "vite",
     "build": "vue-tsc -b && vite build",
     "preview": "vite preview",
-    "deploy:cf": "pnpm build && wrangler pages deploy dist"
+    "deploy:cf": "pnpm build && wrangler deploy"
   },
   "dependencies": {
     "chart.js": "^4.5.0",

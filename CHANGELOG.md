@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-06-20
+
+### Changed
+
+- 部署从 Cloudflare Pages 迁移到 Cloudflare Workers Assets
+- `wrangler.toml` 改为 `[assets]` 配置，SPA 路由回退通过 `not_found_handling` 处理
+- 删除 `public/_redirects`（Workers 原生支持 SPA 回退）
+- `deploy:cf` 脚本改为 `wrangler deploy`
+- GitHub Actions workflow 简化（移除 Pages 项目创建步骤）
+
 ## [1.1.0] - 2026-06-20
 
 ### Added

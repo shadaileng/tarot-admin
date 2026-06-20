@@ -78,7 +78,7 @@
 tarot-admin/
 ├── index.html
 ├── package.json
-├── wrangler.toml              # Cloudflare Pages Wrangler 配置
+├── wrangler.toml              # Cloudflare Workers Wrangler 配置
 ├── tsconfig.json / tsconfig.app.json / tsconfig.node.json
 ├── vite.config.ts
 ├── postcss.config.js
@@ -89,9 +89,7 @@ tarot-admin/
 ├── AGENTS.md                 # AI 协作指南
 ├── README.md                 # 项目说明
 ├── CHANGELOG.md              # 变更日志
-├── public/
-│   ├── favicon.svg
-│   └── _redirects            # Cloudflare Pages SPA 路由回退
+├── public/favicon.svg
 ├── docs/
 │   ├── PLAN.md               # 本文档
 │   ├── API.md                # 后端 API 对接文档
