@@ -1,4 +1,4 @@
-import type { ServiceInfo, HealthResponse, LogListResponse, LogEntry, MetricsSnapshot } from '@/types'
+import type { ServiceInfo, HealthResponse, LogListResponse, LogEntry, MetricsSnapshot, ConfigResponse } from '@/types'
 
 const BASE = import.meta.env.VITE_API_BASE_URL
 
@@ -55,5 +55,21 @@ export function parsePrometheusMetrics(raw: string): Partial<MetricsSnapshot> {
     cacheMisses: result['poster_cache_misses_total'] ?? 0,
     cacheHitRate: result['poster_cache_hit_rate'] ?? 0,
     errorCount: result['poster_errors_total'] ?? 0,
+  }
+}
+
+export function fetchConfig(): Promise<ConfigResponse> {
+  return request<ConfigResponse>('/config')
+}
+
+export async function updateConfigItem(key: string, value: string): Promise<void> {
+  const res = await fetch(`${BASE}/config/${key}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ value }),
+  })
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}))
+    throw new Error(body.error || `HTTP ${res.status}: ${res.statusText}`)
   }
 }

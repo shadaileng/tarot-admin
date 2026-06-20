@@ -18,6 +18,7 @@ export default defineConfig({
       '/health': 'http://localhost:3000',
       '/metrics': 'http://localhost:3000',
       '/logs': 'http://localhost:3000',
+      '/config': 'http://localhost:3000',
       '/cards': 'http://localhost:3000',
     },
   },

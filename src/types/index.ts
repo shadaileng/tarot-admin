@@ -77,3 +77,21 @@ export interface MetricsSnapshot {
   sampleCount: number
   nonCacheSampleCount: number
 }
+
+export interface ConfigItem {
+  key: string
+  label: string
+  value: string
+  source: 'env' | 'user'
+  editable: boolean
+  type: 'string' | 'number'
+}
+
+export interface ConfigGroup {
+  name: string
+  items: ConfigItem[]
+}
+
+export interface ConfigResponse {
+  groups: ConfigGroup[]
+}
