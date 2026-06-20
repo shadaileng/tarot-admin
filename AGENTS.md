@@ -164,7 +164,23 @@ pnpm install          # 安装依赖
 pnpm dev              # 开发服务器 http://localhost:5173
 pnpm build            # 类型检查 + 生产构建 → dist/
 pnpm preview          # 预览构建产物
+pnpm deploy:cf        # 构建 + 部署到 Cloudflare Pages
 ```
+
+## 部署
+
+### Cloudflare Pages
+
+| 方式 | 说明 |
+|------|------|
+| `pnpm deploy:cf` | Wrangler CLI（构建 + 上传一键完成） |
+| 手动分步 | `pnpm build` → `npx wrangler pages deploy dist --project-name=tarot-admin` |
+| Dashboard 上传 | 构建后拖拽 `dist/` 到 Cloudflare Pages Dashboard |
+| Git 集成 | 连接仓库，Build: `pnpm build`，Output: `dist` |
+| GitHub Actions | `.github/workflows/deploy.yml`，push `master` 自动部署 |
+
+> `public/_redirects` 已配置 `/* /index.html 200`，Cloudflare Pages 自动生效。
+> 环境变量 `VITE_API_BASE_URL` 需在 Cloudflare Pages Dashboard 或 GitHub vars 中配置。
 
 ## 主题系统
 

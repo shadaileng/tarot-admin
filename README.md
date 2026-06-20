@@ -125,11 +125,53 @@ pnpm dev
 
 ## 部署
 
+### Cloudflare Pages
+
+#### 1. Wrangler CLI（一键部署）
+
+```bash
+# 先登录 Cloudflare
+npx wrangler login
+
+# 构建 + 上传
+pnpm deploy:cf
+```
+
+#### 2. 手动分步
+
+```bash
+pnpm build
+npx wrangler pages deploy dist --project-name=tarot-admin
+```
+
+#### 3. Dashboard 上传
+
+构建后拖拽 `dist/` 目录到 Cloudflare Pages Dashboard。
+
+#### 4. Git 集成
+
+连接仓库后，Cloudflare Pages 自动构建部署：
+- Build command: `pnpm build`
+- Output directory: `dist`
+
+#### 5. GitHub Actions（推荐）
+
+push `master` 分支自动部署，需配置以下 Secrets 和 Variables：
+
+| 类型 | 名称 | 说明 |
+|------|------|------|
+| Secret | `CLOUDFLARE_API_TOKEN` | Cloudflare API Token |
+| Secret | `CLOUDFLARE_ACCOUNT_ID` | Cloudflare Account ID |
+| Variable | `CLOUDFLARE_PAGES_NAME` | Pages 项目名（如 `tarot-admin`） |
+| Variable | `VITE_API_BASE_URL` | 后端 API 地址（如 `https://api.example.com`） |
+
+> `public/_redirects` 已配置 `/* /index.html 200`，Cloudflare Pages 自动生效。
+
 ### 静态托管
 
 ```bash
 pnpm build
-# 将 dist/ 部署到 Nginx / Cloudflare Pages / Vercel
+# 将 dist/ 部署到 Nginx / Vercel 等
 ```
 
 生产环境需要配置反向代理，将 API 请求转发到后端。

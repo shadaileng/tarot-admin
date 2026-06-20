@@ -78,16 +78,20 @@
 tarot-admin/
 ├── index.html
 ├── package.json
+├── wrangler.toml              # Cloudflare Pages Wrangler 配置
 ├── tsconfig.json / tsconfig.app.json / tsconfig.node.json
 ├── vite.config.ts
 ├── postcss.config.js
 ├── .env.development / .env.production
 ├── .env.example              # 环境变量模板
 ├── .gitignore
+├── .github/workflows/deploy.yml  # GitHub Actions 自动部署
 ├── AGENTS.md                 # AI 协作指南
 ├── README.md                 # 项目说明
 ├── CHANGELOG.md              # 变更日志
-├── public/favicon.svg
+├── public/
+│   ├── favicon.svg
+│   └── _redirects            # Cloudflare Pages SPA 路由回退
 ├── docs/
 │   ├── PLAN.md               # 本文档
 │   ├── API.md                # 后端 API 对接文档
