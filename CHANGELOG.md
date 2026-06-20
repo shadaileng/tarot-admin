@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-06-20
+
+### Added
+
+- Cloudflare Pages 部署支持：`public/_redirects` SPA 路由回退、`wrangler.toml` Wrangler 配置
+- `pnpm deploy:cf` 一键部署脚本
+- GitHub Actions 自动部署工作流（`.github/workflows/deploy.yml`），push `master` 自动触发
+- Workflow 自动创建 Pages 项目（幂等，已存在则跳过）
+
 ## [1.0.0] - 2026-06-20
 
 ### Added
