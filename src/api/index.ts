@@ -59,11 +59,11 @@ export function parsePrometheusMetrics(raw: string): Partial<MetricsSnapshot> {
 }
 
 export function fetchConfig(): Promise<ConfigResponse> {
-  return request<ConfigResponse>('/config')
+  return request<ConfigResponse>('/api/config')
 }
 
 export async function updateConfigItem(key: string, value: string): Promise<void> {
-  const res = await fetch(`${BASE}/config/${key}`, {
+  const res = await fetch(`${BASE}/api/config/${key}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ value }),
