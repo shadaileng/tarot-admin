@@ -18,6 +18,16 @@ function formatJson(json: string | null): string {
     return json
   }
 }
+
+function loginTypeLabel(type: string | null): string {
+  switch (type) {
+    case 'wechat': return '微信'
+    case 'email': return '邮箱'
+    case 'wechat+email': return '微信 + 邮箱'
+    case 'anonymous': return '匿名'
+    default: return type ?? '-'
+  }
+}
 </script>
 
 <template>
@@ -63,6 +73,30 @@ function formatJson(json: string | null): string {
               <div>
                 <span class="text-gray-500 dark:text-gray-400">IP</span>
                 <p class="text-gray-900 dark:text-gray-100">{{ log.ip_address ?? '-' }}</p>
+              </div>
+              <div>
+                <span class="text-gray-500 dark:text-gray-400">用户</span>
+                <p class="text-gray-900 dark:text-gray-100">
+                  {{ log.user_nickname ?? '匿名用户' }}
+                </p>
+              </div>
+              <div>
+                <span class="text-gray-500 dark:text-gray-400">邮箱</span>
+                <p class="text-gray-900 dark:text-gray-100">
+                  {{ log.user_email ?? '-' }}
+                </p>
+              </div>
+              <div>
+                <span class="text-gray-500 dark:text-gray-400">登录方式</span>
+                <p class="text-gray-900 dark:text-gray-100">
+                  {{ loginTypeLabel(log.login_type) }}
+                </p>
+              </div>
+              <div>
+                <span class="text-gray-500 dark:text-gray-400">用户ID</span>
+                <p class="font-mono text-xs text-gray-900 dark:text-gray-100 break-all">
+                  {{ log.user_id ?? '-' }}
+                </p>
               </div>
               <div>
                 <span class="text-gray-500 dark:text-gray-400">模型</span>

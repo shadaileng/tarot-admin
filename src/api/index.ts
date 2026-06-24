@@ -2,8 +2,17 @@ import type { ServiceInfo, HealthResponse, LogListResponse, LogEntry, MetricsSna
 
 const BASE = import.meta.env.VITE_API_BASE_URL
 
+function getApiKey(): string | null {
+  return import.meta.env.VITE_API_KEY || null
+}
+
 async function request<T>(path: string): Promise<T> {
-  const res = await fetch(`${BASE}${path}`)
+  const headers: Record<string, string> = {}
+  const apiKey = getApiKey()
+  if (apiKey) {
+    headers['Authorization'] = `Bearer ${apiKey}`
+  }
+  const res = await fetch(`${BASE}${path}`, { headers })
   if (!res.ok) {
     throw new Error(`HTTP ${res.status}: ${res.statusText}`)
   }
@@ -63,9 +72,14 @@ export function fetchConfig(): Promise<ConfigResponse> {
 }
 
 export async function updateConfigItem(key: string, value: string): Promise<void> {
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+  const apiKey = getApiKey()
+  if (apiKey) {
+    headers['Authorization'] = `Bearer ${apiKey}`
+  }
   const res = await fetch(`${BASE}/api/config/${key}`, {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
+    headers,
     body: JSON.stringify({ value }),
   })
   if (!res.ok) {

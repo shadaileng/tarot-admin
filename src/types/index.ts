@@ -43,6 +43,12 @@ export interface LogEntry {
   incomplete: number
   is_error: number
   error_msg: string | null
+  // 用户信息（来自后端 JOIN 查询）
+  user_id: string | null
+  user_nickname: string | null
+  user_email: string | null
+  user_avatar: string | null
+  login_type: string | null
 }
 
 export interface LogListResponse {

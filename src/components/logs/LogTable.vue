@@ -35,14 +35,15 @@ function truncate(text: string | null, len: number): string {
           <th class="text-left py-3 px-4 font-medium text-gray-500 dark:text-gray-400">类型</th>
           <th class="text-left py-3 px-4 font-medium text-gray-500 dark:text-gray-400">问题</th>
           <th class="text-left py-3 px-4 font-medium text-gray-500 dark:text-gray-400">模型</th>
+          <th class="text-left py-3 px-4 font-medium text-gray-500 dark:text-gray-400">用户</th>
         </tr>
       </thead>
       <tbody>
         <tr v-if="loading">
-          <td colspan="7" class="py-8 text-center text-gray-400 dark:text-gray-500">加载中...</td>
+          <td colspan="8" class="py-8 text-center text-gray-400 dark:text-gray-500">加载中...</td>
         </tr>
         <tr v-else-if="logs.length === 0">
-          <td colspan="7" class="py-8 text-center text-gray-400 dark:text-gray-500">暂无数据</td>
+          <td colspan="8" class="py-8 text-center text-gray-400 dark:text-gray-500">暂无数据</td>
         </tr>
         <tr
           v-for="log in logs"
@@ -66,6 +67,9 @@ function truncate(text: string | null, len: number): string {
           </td>
           <td class="py-3 px-4 text-gray-600 dark:text-gray-400 max-w-[200px] truncate">{{ truncate(log.question, 30) }}</td>
           <td class="py-3 px-4 text-gray-500 dark:text-gray-500 text-xs">{{ log.model ?? '-' }}</td>
+          <td class="py-3 px-4 text-gray-600 dark:text-gray-400 max-w-[140px] truncate">
+            {{ log.user_nickname ?? log.user_email ?? (log.user_id ? '匿名' : '-') }}
+          </td>
         </tr>
       </tbody>
     </table>
