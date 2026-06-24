@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0] - 2026-06-24
+
+### Changed
+
+- **BREAKING**: 所有 API 调用同步更新为 `/api` 前缀：
+  - `fetchHealth()` 改为调用 `/api/health`
+  - `fetchLogs()` 改为调用 `/api/logs`
+  - `fetchLogById()` 改为调用 `/api/logs/:id`
+  - `fetchMetricsRaw()` 改为调用 `/api/metrics`
+- Vite dev proxy 简化为单条 `/api` 规则（适配后端路由统一加 `/api` 前缀）
+
 ## [1.4.0] - 2026-06-24
 
 ### Added

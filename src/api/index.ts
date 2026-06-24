@@ -24,7 +24,7 @@ export function fetchServiceInfo(): Promise<ServiceInfo> {
 }
 
 export function fetchHealth(): Promise<HealthResponse> {
-  return request<HealthResponse>('/health')
+  return request<HealthResponse>('/api/health')
 }
 
 export function fetchLogs(params: { page?: number; limit?: number; target?: string } = {}): Promise<LogListResponse> {
@@ -33,15 +33,15 @@ export function fetchLogs(params: { page?: number; limit?: number; target?: stri
   if (params.limit) query.set('limit', String(params.limit))
   if (params.target) query.set('target', params.target)
   const qs = query.toString()
-  return request<LogListResponse>(`/logs${qs ? `?${qs}` : ''}`)
+  return request<LogListResponse>(`/api/logs${qs ? `?${qs}` : ''}`)
 }
 
 export function fetchLogById(id: string): Promise<LogEntry> {
-  return request<LogEntry>(`/logs/${id}`)
+  return request<LogEntry>(`/api/logs/${id}`)
 }
 
 export async function fetchMetricsRaw(): Promise<string> {
-  const res = await fetch(`${BASE}/metrics`)
+  const res = await fetch(`${BASE}/api/metrics`)
   if (!res.ok) {
     throw new Error(`HTTP ${res.status}: ${res.statusText}`)
   }

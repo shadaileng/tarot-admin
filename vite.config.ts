@@ -14,13 +14,7 @@ export default defineConfig({
     host: '0.0.0.0',
     port: 5173,
     proxy: {
-      '/reading': 'http://localhost:3000',
-      '/poster': 'http://localhost:3000',
-      '/health': 'http://localhost:3000',
-      '/metrics': 'http://localhost:3000',
-      '/logs': 'http://localhost:3000',
       '/api': 'http://localhost:3000',
-      '/cards': 'http://localhost:3000',
     },
   },
 })
