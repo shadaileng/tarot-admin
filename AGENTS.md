@@ -95,7 +95,7 @@ tarot-admin/
         ├── LogsView.vue          # 日志查看页面
         ├── HealthView.vue       # 健康监控页面
         ├── MetricsView.vue       # 指标可视化页面（Chart.js 柱状图）
-        ├── ConfigView.vue        # 配置查看页面（环境变量分组展示）
+        ├── ConfigView.vue        # 配置查看页面（环境变量分组展示，只读角色仅可查看不可编辑）
         ├── UsersView.vue         # 用户管理页面（列表/搜索/详情弹窗）
         ├── AdminsView.vue        # 管理员管理页面（仅 admin 角色可见）
         ├── LoginView.vue         # 管理员登录页面
@@ -112,7 +112,7 @@ tarot-admin/
 | `/logs` | `logs` | 日志查看 | 需登录 |
 | `/health` | `health` | 健康监控 | 需登录 |
 | `/metrics` | `metrics` | 指标可视化 | 需登录 |
-| `/config` | `config` | 配置查看 | 需登录 |
+| `/config` | `config` | 配置查看 | 需登录（只读角色仅可查看不可编辑） |
 | `/users` | `users` | 用户管理 | 需登录 |
 | `/admins` | `admins` | 管理员管理 | 仅 admin 角色 |
 
@@ -235,7 +235,7 @@ if (admin.value?.role === 'admin') { /* 管理员专属逻辑 */ }
 
 ## 已知限制
 
-- 本项目为纯只读管理面板，不提供对后端的写入操作
+- 配置修改仅限 `role=admin` 超级管理员，`readonly` 角色通过前后端双重限制（前端隐藏编辑按钮、后端 403 拦截）只能查看
 - 所有 API 调用依赖 `tarot-backend` 运行在 `localhost:3000`
 - 生产环境需自行配置反向代理或 CORS
 - 指标数据为内存态（后端重启后清空）

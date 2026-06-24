@@ -2,6 +2,9 @@
 import { ref, onMounted } from 'vue'
 import { fetchConfig, updateConfigItem } from '@/api'
 import type { ConfigGroup, ConfigItem } from '@/types'
+import { useAuth } from '@/composables/useAuth'
+
+const { admin } = useAuth()
 
 const groups = ref<ConfigGroup[]>([])
 const loading = ref(true)
@@ -114,7 +117,7 @@ onMounted(loadConfig)
               <template v-else>
                 <span class="text-sm text-gray-700 dark:text-gray-300">{{ item.value || '—' }}</span>
                 <button
-                  v-if="item.editable"
+                  v-if="item.editable && admin?.role !== 'readonly'"
                   class="p-1.5 text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
                   title="编辑"
                   @click="startEdit(item)"

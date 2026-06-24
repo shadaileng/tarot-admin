@@ -121,6 +121,13 @@ interface ResetPasswordRequest {
 
 在侧边栏增加「管理员管理」菜单项，仅当 `admin.role === 'admin'` 时显示。
 
+### 8. 配置页面只读保护
+
+| 项目 | 文件 | 说明 |
+|------|------|------|
+| 后端 | `tarot-backend/src/index.ts` | `PUT /api/config/:key` 增加 `adminRole === 'readonly'` 校验，返回 403 |
+| 前端 | `tarot-admin/src/views/ConfigView.vue` | 编辑按钮增加 `admin?.role !== 'readonly'` 条件，只读角色仅可查看 |
+
 ---
 
 ## 权限设计
@@ -129,9 +136,10 @@ interface ResetPasswordRequest {
 |------|------|
 | 只有 `role='admin'` 的超管能看见菜单 | 前端 `v-if` 控制 |
 | 只有 `role='admin'` 的超管能调用 API | 后端 JWT + role 双重校验 |
+| 配置页 `PUT /api/config/:key` 禁止只读角色 | 后端 `adminRole === 'readonly'` 返回 403，前端隐藏编辑按钮 |
 | 禁止操作自己 | 超管不能删除/禁用自己的账号 |
 | 重置密码后强制改密 | `must_change_password=1` |
-| `readonly` 角色 | 看不到菜单，无法调用管理 API |
+| `readonly` 角色 | 看不到管理员菜单，无法调用管理 API，配置页只可查看不可编辑 |
 
 ---
 
@@ -175,6 +183,8 @@ interface ResetPasswordRequest {
 | 6 | tarot-admin | `src/router/index.ts` | 新增 /admins 路由 |
 | 7 | tarot-admin | `src/composables/useAuth.ts` | 支持 role 守卫逻辑（如需要） |
 | 8 | tarot-admin | `src/components/layout/Sidebar.vue` | 新增管理员管理菜单项 |
+| 9 | tarot-backend | `src/index.ts` | `PUT /api/config/:key` 增加只读角色 403 拦截 |
+| 10 | tarot-admin | `src/views/ConfigView.vue` | 配置页编辑按钮对只读角色隐藏 |
 
 ---
 
