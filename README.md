@@ -82,6 +82,44 @@ tarot-admin/
     └── views/                   # 5 个页面视图
 ```
 
+## 实现顺序
+
+> 本节汇总 docs/ 目录下开发计划的落地时序。状态：✅ 已完成  🟡 进行中  ⬜ 待实施
+
+### 阶段 0：基础管理面板
+
+| 顺序 | 计划文档 | 范围 | 状态 |
+|:---:|---------|------|:---:|
+| 0.1 | `docs/PLAN.md` §五 Step 1-6 | Vue3 骨架 + 5 页面 + 路由 + 主题 | ✅ |
+| 0.2 | `docs/API.md` | 后端 API 端点定义 | ✅ |
+| 0.3 | `docs/ARCHITECTURE.md` | 前端架构与数据流 | ✅ |
+
+### 阶段 1：可观测性消费
+
+| 顺序 | 计划文档 | 范围 | 状态 |
+|:---:|---------|------|:---:|
+| 1.1 | `docs/PLAN.md` Step 4-5 | Dashboard / Health / Logs / Metrics / Config 页面 | ✅ |
+
+### 阶段 2：Admin 认证
+
+| 顺序 | 计划文档 | 范围 | 状态 |
+|:---:|---------|------|:---:|
+| 2.1 | `docs/ADMIN_LOGIN_PLAN.md` | 登录页 / useAuth / LoginView 雏形 | ✅ |
+| 2.2 | `docs/ADMIN_AUTH_UPGRADE_PLAN.md` §二 | 移除 VITE_API_KEY + ChangePasswordView + TopBar 用户菜单 + 路由守卫 | ✅ |
+
+### 阶段 3：日志与用户管理
+
+| 顺序 | 计划文档 | 范围 | 状态 |
+|:---:|---------|------|:---:|
+| 3.1 | `docs/ADMIN_LOGS_USER_PLAN.md` 前端 | LogEntry 扩字段 + 表格/详情展示用户 | ⬜ |
+| 3.2 | `docs/ADMIN_USERS_PLAN.md` 前端 | 用户管理页面（搜索/列表/统计） | ✅ |
+
+### 跨项目依赖
+
+- 📦 前置依赖：需 tarot-backend 阶段 0+1 就绪
+- 📦 前置依赖：需 tarot-backend 阶段 2 就绪（Admin 登录）
+- 📦 后续依赖：tarot-miniprogram 阶段 2.x 用户上线后，日志页才能显示真实数据
+
 ## 环境变量
 
 | 变量 | 用途 | 默认值 |
