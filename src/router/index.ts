@@ -52,6 +52,12 @@ const router = createRouter({
       component: () => import('@/views/UsersView.vue'),
       meta: { title: '用户管理' },
     },
+    {
+      path: '/admins',
+      name: 'admins',
+      component: () => import('@/views/AdminsView.vue'),
+      meta: { title: '管理员管理', requireRole: 'admin' },
+    },
   ],
 })
 
@@ -79,6 +85,11 @@ router.beforeEach((to, from, next) => {
 
   // 已改密访问改密页：重定向到首页
   if (to.path === '/change-password' && !admin.value?.mustChangePassword) {
+    return next('/')
+  }
+
+  // role 权限校验：只有 role=admin 可访问管理员管理
+  if ((to.meta as any).requireRole === 'admin' && admin.value?.role !== 'admin') {
     return next('/')
   }
 

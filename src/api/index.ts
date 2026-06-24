@@ -1,4 +1,4 @@
-import type { ServiceInfo, HealthResponse, LogListResponse, LogEntry, MetricsSnapshot, ConfigResponse, UserListResponse } from '@/types'
+import type { ServiceInfo, HealthResponse, LogListResponse, LogEntry, MetricsSnapshot, ConfigResponse, UserListResponse, AdminListResponse, AdminEntry, CreateAdminRequest, UpdateAdminRequest, ResetPasswordRequest, ApiResponse } from '@/types'
 import { useAuth } from '@/composables/useAuth'
 
 const BASE = import.meta.env.VITE_API_BASE_URL
@@ -7,21 +7,46 @@ function getAuthHeaders(): Record<string, string> {
   return useAuth().getAuthHeaders()
 }
 
-async function request<T>(path: string): Promise<T> {
-  const headers = getAuthHeaders()
-  const res = await fetch(`${BASE}${path}`, { headers })
+async function request<T>(path: string, options?: RequestInit): Promise<T> {
+  const headers = { ...getAuthHeaders(), ...(options?.headers || {}) }
+  const res = await fetch(`${BASE}${path}`, { ...options, headers })
   if (!res.ok) {
-    throw new Error(`HTTP ${res.status}: ${res.statusText}`)
+    const body = await res.json().catch(() => ({}))
+    throw new Error(body.message || body.error || `HTTP ${res.status}: ${res.statusText}`)
   }
   return res.json() as Promise<T>
 }
 
+async function getRequest<T>(path: string): Promise<T> {
+  return request<T>(path)
+}
+
+async function postRequest<T>(path: string, body: unknown): Promise<T> {
+  return request<T>(path, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  })
+}
+
+async function putRequest<T>(path: string, body: unknown): Promise<T> {
+  return request<T>(path, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  })
+}
+
+async function deleteRequest<T>(path: string): Promise<T> {
+  return request<T>(path, { method: 'DELETE' })
+}
+
 export function fetchServiceInfo(): Promise<ServiceInfo> {
-  return request<ServiceInfo>('/')
+  return getRequest<ServiceInfo>('/')
 }
 
 export function fetchHealth(): Promise<HealthResponse> {
-  return request<HealthResponse>('/api/health')
+  return getRequest<HealthResponse>('/api/health')
 }
 
 export function fetchLogs(params: { page?: number; limit?: number; target?: string } = {}): Promise<LogListResponse> {
@@ -30,11 +55,11 @@ export function fetchLogs(params: { page?: number; limit?: number; target?: stri
   if (params.limit) query.set('limit', String(params.limit))
   if (params.target) query.set('target', params.target)
   const qs = query.toString()
-  return request<LogListResponse>(`/api/logs${qs ? `?${qs}` : ''}`)
+  return getRequest<LogListResponse>(`/api/logs${qs ? `?${qs}` : ''}`)
 }
 
 export function fetchLogById(id: string): Promise<LogEntry> {
-  return request<LogEntry>(`/api/logs/${id}`)
+  return getRequest<LogEntry>(`/api/logs/${id}`)
 }
 
 export async function fetchMetricsRaw(): Promise<string> {
@@ -74,22 +99,44 @@ export function fetchUsers(params: {
   if (params.limit) query.set('limit', String(params.limit))
   if (params.keyword) query.set('keyword', params.keyword)
   const qs = query.toString()
-  return request<UserListResponse>(`/api/admin/users${qs ? `?${qs}` : ''}`)
+  return getRequest<UserListResponse>(`/api/admin/users${qs ? `?${qs}` : ''}`)
 }
 
 export function fetchConfig(): Promise<ConfigResponse> {
-  return request<ConfigResponse>('/api/config')
+  return getRequest<ConfigResponse>('/api/config')
 }
 
 export async function updateConfigItem(key: string, value: string): Promise<void> {
-  const headers: Record<string, string> = { 'Content-Type': 'application/json', ...getAuthHeaders() }
-  const res = await fetch(`${BASE}/api/config/${key}`, {
-    method: 'PUT',
-    headers,
-    body: JSON.stringify({ value }),
-  })
-  if (!res.ok) {
-    const body = await res.json().catch(() => ({}))
-    throw new Error(body.error || `HTTP ${res.status}: ${res.statusText}`)
-  }
+  await putRequest(`/api/config/${key}`, { value })
+}
+
+// ========== 管理员 CRUD API ==========
+
+export async function fetchAdmins(params: {
+  page?: number
+  pageSize?: number
+  search?: string
+} = {}): Promise<ApiResponse<AdminListResponse>> {
+  const query = new URLSearchParams()
+  if (params.page) query.set('page', String(params.page))
+  if (params.pageSize) query.set('pageSize', String(params.pageSize))
+  if (params.search) query.set('search', params.search)
+  const qs = query.toString()
+  return getRequest<ApiResponse<AdminListResponse>>(`/api/admin/admins${qs ? `?${qs}` : ''}`)
+}
+
+export function createAdmin(data: CreateAdminRequest): Promise<ApiResponse<AdminEntry>> {
+  return postRequest<ApiResponse<AdminEntry>>('/api/admin/admins', data)
+}
+
+export function updateAdmin(id: string, data: UpdateAdminRequest): Promise<ApiResponse<null>> {
+  return putRequest<ApiResponse<null>>(`/api/admin/admins/${id}`, data)
+}
+
+export function deleteAdmin(id: string): Promise<ApiResponse<null>> {
+  return deleteRequest<ApiResponse<null>>(`/api/admin/admins/${id}`)
+}
+
+export function resetAdminPassword(id: string, data: ResetPasswordRequest): Promise<ApiResponse<null>> {
+  return postRequest<ApiResponse<null>>(`/api/admin/admins/${id}/reset-password`, data)
 }

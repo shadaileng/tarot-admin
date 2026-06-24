@@ -139,3 +139,43 @@ export interface UserListResponse {
   limit: number
   data: UserEntry[]
 }
+
+export interface AdminEntry {
+  id: string
+  username: string
+  displayName: string
+  role: string
+  isActive: boolean
+  lastLoginAt: string | null
+  createdAt: string
+}
+
+export interface AdminListResponse {
+  list: AdminEntry[]
+  total: number
+  page: number
+  pageSize: number
+}
+
+export interface CreateAdminRequest {
+  username: string
+  displayName: string
+  password: string
+  role: string
+}
+
+export interface UpdateAdminRequest {
+  displayName?: string
+  role?: string
+  isActive?: boolean
+}
+
+export interface ResetPasswordRequest {
+  password: string
+}
+
+export interface ApiResponse<T> {
+  success: boolean
+  data: T
+  error?: string
+}
