@@ -1,4 +1,4 @@
-import type { ServiceInfo, HealthResponse, LogListResponse, LogEntry, MetricsSnapshot, ConfigResponse } from '@/types'
+import type { ServiceInfo, HealthResponse, LogListResponse, LogEntry, MetricsSnapshot, ConfigResponse, UserListResponse } from '@/types'
 
 const BASE = import.meta.env.VITE_API_BASE_URL
 
@@ -65,6 +65,19 @@ export function parsePrometheusMetrics(raw: string): Partial<MetricsSnapshot> {
     cacheHitRate: result['poster_cache_hit_rate'] ?? 0,
     errorCount: result['poster_errors_total'] ?? 0,
   }
+}
+
+export function fetchUsers(params: {
+  page?: number
+  limit?: number
+  keyword?: string
+} = {}): Promise<UserListResponse> {
+  const query = new URLSearchParams()
+  if (params.page) query.set('page', String(params.page))
+  if (params.limit) query.set('limit', String(params.limit))
+  if (params.keyword) query.set('keyword', params.keyword)
+  const qs = query.toString()
+  return request<UserListResponse>(`/api/admin/users${qs ? `?${qs}` : ''}`)
 }
 
 export function fetchConfig(): Promise<ConfigResponse> {

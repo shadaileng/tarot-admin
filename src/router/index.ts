@@ -33,6 +33,12 @@ const router = createRouter({
       component: () => import('@/views/ConfigView.vue'),
       meta: { title: '配置' },
     },
+    {
+      path: '/users',
+      name: 'users',
+      component: () => import('@/views/UsersView.vue'),
+      meta: { title: '用户管理' },
+    },
   ],
 })
 

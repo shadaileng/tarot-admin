@@ -101,3 +101,23 @@ export interface ConfigGroup {
 export interface ConfigResponse {
   groups: ConfigGroup[]
 }
+
+export interface UserEntry {
+  id: string
+  openid: string
+  nickname: string
+  avatar_url: string | null
+  email: string | null
+  phone: string | null
+  created_at: string
+  last_login_at: string | null
+  request_count: number
+  last_request_at: string | null
+}
+
+export interface UserListResponse {
+  total: number
+  page: number
+  limit: number
+  data: UserEntry[]
+}

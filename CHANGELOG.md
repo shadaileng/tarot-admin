@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2026-06-24
+
+### Added
+
+- 新增用户管理页面 `/users`，支持查看所有小程序用户的列表、搜索、请求统计
+- 用户详情弹窗：展示完整个人信息（ID、昵称、邮箱、手机号、注册时间、最近登录、请求统计）
+- 侧边栏新增「用户管理」导航入口
+
 ## [1.2.0] - 2026-06-20
 
 ### Changed
