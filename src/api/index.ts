@@ -1,4 +1,5 @@
 import type { ServiceInfo, HealthResponse, LogListResponse, LogEntry, MetricsSnapshot, ConfigResponse, UserListResponse } from '@/types'
+import { useAuth } from '@/composables/useAuth'
 
 const BASE = import.meta.env.VITE_API_BASE_URL
 
@@ -6,12 +7,25 @@ function getApiKey(): string | null {
   return import.meta.env.VITE_API_KEY || null
 }
 
-async function request<T>(path: string): Promise<T> {
-  const headers: Record<string, string> = {}
+function getAuthHeaders(): Record<string, string> {
+  const { getAuthHeaders: getAdminHeaders, token } = useAuth()
+
+  // 优先使用 Admin JWT
+  if (token.value) {
+    return getAdminHeaders()
+  }
+
+  // 回退到 API Key
   const apiKey = getApiKey()
   if (apiKey) {
-    headers['Authorization'] = `Bearer ${apiKey}`
+    return { Authorization: `Bearer ${apiKey}` }
   }
+
+  return {}
+}
+
+async function request<T>(path: string): Promise<T> {
+  const headers = getAuthHeaders()
   const res = await fetch(`${BASE}${path}`, { headers })
   if (!res.ok) {
     throw new Error(`HTTP ${res.status}: ${res.statusText}`)
@@ -85,11 +99,7 @@ export function fetchConfig(): Promise<ConfigResponse> {
 }
 
 export async function updateConfigItem(key: string, value: string): Promise<void> {
-  const headers: Record<string, string> = { 'Content-Type': 'application/json' }
-  const apiKey = getApiKey()
-  if (apiKey) {
-    headers['Authorization'] = `Bearer ${apiKey}`
-  }
+  const headers: Record<string, string> = { 'Content-Type': 'application/json', ...getAuthHeaders() }
   const res = await fetch(`${BASE}/api/config/${key}`, {
     method: 'PUT',
     headers,

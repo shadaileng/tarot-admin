@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] - 2026-06-24
+
+### Added
+
+- 管理员登录页面 `/login`：用户名+密码表单、加载状态、错误提示、居中卡片布局
+- `useAuth` 组合式函数：token/登录/登出/Authorization header 管理，localStorage 持久化
+- 路由守卫：未登录自动跳转 `/login`，已登录跳过登录页
+- `App.vue` 支持 login 页面的 `blank` 布局（不显示侧边栏和顶部栏）
+- 请求层 `api/index.ts` 适配双轨认证：优先使用 Admin JWT，回退到 API Key
+
 ## [2.0.0] - 2026-06-24
 
 ### Changed

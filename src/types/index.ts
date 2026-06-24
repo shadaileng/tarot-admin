@@ -84,6 +84,23 @@ export interface MetricsSnapshot {
   nonCacheSampleCount: number
 }
 
+export interface AdminInfo {
+  id: string
+  username: string
+  displayName: string
+  role: string
+}
+
+export interface AuthResponse {
+  token: string
+  admin: AdminInfo
+}
+
+export interface LoginRequest {
+  username: string
+  password: string
+}
+
 export interface ConfigItem {
   key: string
   label: string

@@ -1,8 +1,15 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { useAuth } from '@/composables/useAuth'
 
 const router = createRouter({
   history: createWebHistory(),
   routes: [
+    {
+      path: '/login',
+      name: 'login',
+      component: () => import('@/views/LoginView.vue'),
+      meta: { title: '登录', layout: 'blank' },
+    },
     {
       path: '/',
       name: 'dashboard',
@@ -44,6 +51,21 @@ const router = createRouter({
 
 router.beforeEach((to) => {
   document.title = `${(to.meta as any).title || 'Admin'} - Tarot Admin`
+})
+
+router.beforeEach((to, from, next) => {
+  const { isLoggedIn } = useAuth()
+
+  // 访问登录页：已登录则重定向到首页
+  if (to.path === '/login') {
+    if (isLoggedIn.value) return next('/')
+    return next()
+  }
+
+  // 访问普通页面：未登录则重定向到登录页
+  if (!isLoggedIn.value) return next('/login')
+
+  next()
 })
 
 export default router
