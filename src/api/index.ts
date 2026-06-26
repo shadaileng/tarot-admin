@@ -8,8 +8,11 @@ function getAuthHeaders(): Record<string, string> {
 }
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
-  const headers = { ...getAuthHeaders(), ...(options?.headers || {}) }
-  const res = await fetch(`${BASE}${path}`, { ...options, headers })
+  const h = new Headers(getAuthHeaders())
+  if (options?.headers) {
+    new Headers(options.headers).forEach((v, k) => h.set(k, v))
+  }
+  const res = await fetch(`${BASE}${path}`, { ...options, headers: h })
   if (!res.ok) {
     const body = await res.json().catch(() => ({}))
     throw new Error(body.message || body.error || `HTTP ${res.status}: ${res.statusText}`)
