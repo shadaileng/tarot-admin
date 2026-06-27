@@ -265,7 +265,7 @@ async function handleRestore(user: UserEntry) {
               <td class="px-4 py-3 text-right" @click.stop>
                 <div class="flex items-center justify-end gap-2">
                   <button
-                    v-if="tab === 'normal' && user.email"
+                    v-if="tab === 'normal' && user.email && user.openid"
                     class="px-2.5 py-1 text-xs font-medium rounded-lg border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                     @click="handleUnbindEmail(user)"
                   >
