@@ -144,13 +144,27 @@ export function fetchUsers(params: {
   page?: number
   limit?: number
   keyword?: string
+  deleted?: boolean
 } = {}): Promise<UserListResponse> {
   const query = new URLSearchParams()
   if (params.page) query.set('page', String(params.page))
   if (params.limit) query.set('limit', String(params.limit))
   if (params.keyword) query.set('keyword', params.keyword)
+  if (params.deleted) query.set('deleted', 'true')
   const qs = query.toString()
   return getRequest<UserListResponse>(`/api/admin/users${qs ? `?${qs}` : ''}`)
+}
+
+export function unbindEmail(userId: string): Promise<{ message: string }> {
+  return putRequest<{ message: string }>(`/api/admin/users/${userId}/unbind-email`, {})
+}
+
+export function deleteUser(userId: string): Promise<{ message: string }> {
+  return deleteRequest<{ message: string }>(`/api/admin/users/${userId}`)
+}
+
+export function restoreUser(userId: string): Promise<{ message: string }> {
+  return putRequest<{ message: string }>(`/api/admin/users/${userId}/restore`, {})
 }
 
 export function fetchConfig(): Promise<ConfigResponse> {

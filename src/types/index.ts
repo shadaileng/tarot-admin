@@ -131,6 +131,7 @@ export interface UserEntry {
   last_login_at: string | null
   request_count: number
   last_request_at: string | null
+  deleted_at: string | null
 }
 
 export interface UserListResponse {

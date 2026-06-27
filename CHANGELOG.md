@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.4.0] - 2026-06-27
+
+### Added
+
+- 用户管理新增正常用户/已删除用户 Tab 切换视图
+- 新增操作列: 解除邮箱绑定、逻辑删除用户、恢复已删除用户
+- 删除确认弹窗 + Toast 操作反馈
+
+### Fixed
+
+- fetchUsers 增加 deleted 参数，支持查询已删除用户
+
 ## [2.3.4] - 2026-06-26
 
 ### Fixed
