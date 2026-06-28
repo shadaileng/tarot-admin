@@ -1,4 +1,4 @@
-import type { ServiceInfo, HealthResponse, LogListResponse, LogEntry, MetricsSnapshot, ConfigResponse, UserListResponse, AdminListResponse, AdminEntry, CreateAdminRequest, UpdateAdminRequest, ResetPasswordRequest, ApiResponse } from '@/types'
+import type { ServiceInfo, HealthResponse, LogListResponse, LogEntry, MetricsSnapshot, ConfigResponse, UserListResponse, AdminListResponse, AdminEntry, CreateAdminRequest, UpdateAdminRequest, ResetPasswordRequest, ApiResponse, LevelDefinitionEntry, TaskDefinitionEntry, CreateTaskDefinitionRequest, UpdateTaskDefinitionRequest, UserStatsEntry } from '@/types'
 import { useAuth } from '@/composables/useAuth'
 
 const BASE = import.meta.env.VITE_API_BASE_URL
@@ -204,4 +204,47 @@ export function deleteAdmin(id: string): Promise<ApiResponse<null>> {
 
 export function resetAdminPassword(id: string, data: ResetPasswordRequest): Promise<ApiResponse<null>> {
   return postRequest<ApiResponse<null>>(`/api/admin/admins/${id}/reset-password`, data)
+}
+
+// ========== 等级管理 API ==========
+
+export function fetchLevelDefinitions(): Promise<{ levels: LevelDefinitionEntry[] }> {
+  return getRequest<{ levels: LevelDefinitionEntry[] }>('/api/levels')
+}
+
+export function updateLevelDefinition(level: number, data: Partial<LevelDefinitionEntry>): Promise<void> {
+  return putRequest<void>(`/api/admin/level-definitions/${level}`, data)
+}
+
+// ========== 任务管理 API ==========
+
+export function fetchTaskDefinitions(): Promise<{ tasks: TaskDefinitionEntry[] }> {
+  return getRequest<{ tasks: TaskDefinitionEntry[] }>('/api/admin/task-definitions')
+}
+
+export function createTaskDefinition(data: CreateTaskDefinitionRequest): Promise<void> {
+  return postRequest<void>('/api/admin/task-definitions', data)
+}
+
+export function updateTaskDefinition(id: string, data: UpdateTaskDefinitionRequest): Promise<void> {
+  return putRequest<void>(`/api/admin/task-definitions/${id}`, data)
+}
+
+// ========== 用户统计 API ==========
+
+export function fetchUserStatsList(params: {
+  page?: number
+  limit?: number
+  keyword?: string
+} = {}): Promise<{ total: number; page: number; limit: number; data: UserStatsEntry[] }> {
+  const query = new URLSearchParams()
+  if (params.page) query.set('page', String(params.page))
+  if (params.limit) query.set('limit', String(params.limit))
+  if (params.keyword) query.set('keyword', params.keyword)
+  const qs = query.toString()
+  return getRequest(`/api/admin/user-stats${qs ? `?${qs}` : ''}`)
+}
+
+export function updateUserPoints(userId: string, delta: number): Promise<void> {
+  return putRequest<void>(`/api/admin/users/${userId}/points`, { delta })
 }

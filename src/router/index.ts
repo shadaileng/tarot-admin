@@ -58,6 +58,24 @@ const router = createRouter({
       component: () => import('@/views/AdminsView.vue'),
       meta: { title: '管理员管理', requireRole: 'admin' },
     },
+    {
+      path: '/levels',
+      name: 'levels',
+      component: () => import('@/views/LevelsView.vue'),
+      meta: { title: '等级管理' },
+    },
+    {
+      path: '/task-definitions',
+      name: 'task-definitions',
+      component: () => import('@/views/TaskDefinitionsView.vue'),
+      meta: { title: '任务管理' },
+    },
+    {
+      path: '/user-stats',
+      name: 'user-stats',
+      component: () => import('@/views/UserStatsView.vue'),
+      meta: { title: '用户统计' },
+    },
   ],
 })
 

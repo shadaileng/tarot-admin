@@ -180,3 +180,67 @@ export interface ApiResponse<T> {
   data: T
   error?: string
 }
+
+// ========== 积分等级体系 ==========
+
+export interface LevelDefinitionEntry {
+  level: number
+  title: string
+  points_required: number
+  daily_quota: number
+  max_extra_quota: number
+}
+
+export interface TaskDefinitionEntry {
+  id: string
+  title: string
+  description: string | null
+  type: string
+  requirement_type: string
+  requirement_count: number
+  points_reward: number
+  extra_quota_reward: number
+  icon: string | null
+  sort_order: number
+  is_active: number
+}
+
+export interface CreateTaskDefinitionRequest {
+  title: string
+  description?: string | null
+  type: string
+  requirement_type: string
+  requirement_count: number
+  points_reward: number
+  extra_quota_reward: number
+  icon?: string | null
+  sort_order?: number
+}
+
+export interface UpdateTaskDefinitionRequest {
+  title?: string
+  description?: string | null
+  type?: string
+  requirement_type?: string
+  requirement_count?: number
+  points_reward?: number
+  extra_quota_reward?: number
+  icon?: string | null
+  sort_order?: number
+  is_active?: number
+}
+
+export interface UserStatsEntry {
+  user_id: string
+  nickname: string
+  email: string | null
+  points: number
+  level: number
+  level_title: string
+  extra_quota: number
+  total_readings: number
+  daily_quota_used: number
+  consecutive_checkins: number
+  referral_code: string
+  created_at: string
+}
