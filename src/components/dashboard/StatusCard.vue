@@ -33,9 +33,14 @@ defineProps<{
         <span class="text-sm text-gray-600 dark:text-gray-400">Gemini API</span>
         <span
           class="text-sm font-medium"
-          :class="health?.gemini === 'up' ? 'text-green-600 dark:text-green-400' : 'text-yellow-600 dark:text-yellow-400'"
+          :class="{
+            'text-green-600 dark:text-green-400': health?.gemini === 'up',
+            'text-yellow-600 dark:text-yellow-400': health?.gemini === 'unconfigured',
+            'text-orange-600 dark:text-orange-400': health?.gemini === 'quota_exhausted',
+            'text-red-600 dark:text-red-400': health?.gemini === 'down',
+          }"
         >
-          {{ health?.gemini === 'up' ? '已配置' : '未配置' }}
+          {{ health?.gemini === 'up' ? '已配置' : health?.gemini === 'unconfigured' ? '未配置' : health?.gemini === 'quota_exhausted' ? '配额耗尽' : 'API 不可用' }}
         </span>
       </div>
     </div>

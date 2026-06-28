@@ -18,7 +18,11 @@ const { data, error, loading } = useHealth(5000)
     <template v-else-if="data">
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <HealthCard label="服务状态" :value="data.status === 'ok' ? '正常' : '异常'" :color="data.status === 'ok' ? 'green' : 'red'" />
-        <HealthCard label="Gemini API" :value="data.gemini === 'up' ? '已配置' : '未配置'" :color="data.gemini === 'up' ? 'green' : 'yellow'" />
+        <HealthCard
+          label="Gemini API"
+          :value="data.gemini === 'up' ? '已配置' : data.gemini === 'unconfigured' ? '未配置' : data.gemini === 'quota_exhausted' ? '配额耗尽' : 'API 不可用'"
+          :color="data.gemini === 'up' ? 'green' : data.gemini === 'unconfigured' ? 'yellow' : data.gemini === 'quota_exhausted' ? 'orange' : 'red'"
+        />
         <HealthCard label="总请求" :value="data.metrics.totalRequests" color="indigo" />
         <HealthCard label="平均耗时" :value="`${data.metrics.avgTotalMs}ms`" color="blue" />
       </div>

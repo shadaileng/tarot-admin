@@ -2,13 +2,14 @@
 defineProps<{
   label: string
   value: string | number
-  color?: 'indigo' | 'green' | 'yellow' | 'red' | 'blue'
+  color?: 'indigo' | 'green' | 'yellow' | 'orange' | 'red' | 'blue'
 }>()
 
 const dotColor: Record<string, string> = {
   indigo: 'bg-indigo-500',
   green: 'bg-green-500',
   yellow: 'bg-yellow-500',
+  orange: 'bg-orange-500',
   red: 'bg-red-500',
   blue: 'bg-blue-500',
 }
