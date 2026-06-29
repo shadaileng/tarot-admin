@@ -94,6 +94,12 @@ const router = createRouter({
       component: () => import('@/views/CheckinStatsView.vue'),
       meta: { title: '签到统计' },
     },
+    {
+      path: '/feedback',
+      name: 'feedback',
+      component: () => import('@/views/FeedbackView.vue'),
+      meta: { title: '意见反馈' },
+    },
   ],
 })
 

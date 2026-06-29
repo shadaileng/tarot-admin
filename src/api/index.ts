@@ -1,4 +1,4 @@
-import type { ServiceInfo, HealthResponse, LogListResponse, LogEntry, MetricsSnapshot, ConfigResponse, UserListResponse, AdminListResponse, AdminEntry, CreateAdminRequest, UpdateAdminRequest, ResetPasswordRequest, ApiResponse, LevelDefinitionEntry, TaskDefinitionEntry, CreateTaskDefinitionRequest, UpdateTaskDefinitionRequest, UserStatsEntry, TrendResponse, AdminInviteListResponse, CheckinStatsResponse } from '@/types'
+import type { ServiceInfo, HealthResponse, LogListResponse, LogEntry, MetricsSnapshot, ConfigResponse, UserListResponse, AdminListResponse, AdminEntry, CreateAdminRequest, UpdateAdminRequest, ResetPasswordRequest, ApiResponse, LevelDefinitionEntry, TaskDefinitionEntry, CreateTaskDefinitionRequest, UpdateTaskDefinitionRequest, UserStatsEntry, TrendResponse, AdminInviteListResponse, CheckinStatsResponse, FeedbackListResponse, FeedbackDetail } from '@/types'
 import { useAuth } from '@/composables/useAuth'
 
 const BASE = import.meta.env.VITE_API_BASE_URL
@@ -303,4 +303,33 @@ export function resetUserQuota(userId: string): Promise<void> {
 
 export function clearUserInvite(userId: string): Promise<void> {
   return putRequest<void>(`/api/admin/users/${userId}/clear-invite`, {})
+}
+
+// ========== 意见反馈 API ==========
+
+export function fetchFeedbackList(params: {
+  page?: number
+  limit?: number
+  keyword?: string
+  status?: string
+} = {}): Promise<FeedbackListResponse> {
+  const query = new URLSearchParams()
+  if (params.page) query.set('page', String(params.page))
+  if (params.limit) query.set('limit', String(params.limit))
+  if (params.keyword) query.set('keyword', params.keyword)
+  if (params.status) query.set('status', params.status)
+  const qs = query.toString()
+  return getRequest<FeedbackListResponse>(`/api/admin/feedback${qs ? `?${qs}` : ''}`)
+}
+
+export function fetchFeedbackDetail(id: string): Promise<FeedbackDetail> {
+  return getRequest<FeedbackDetail>(`/api/admin/feedback/${id}`)
+}
+
+export function replyFeedback(id: string, reply: string): Promise<void> {
+  return postRequest<void>(`/api/admin/feedback/${id}/reply`, { reply })
+}
+
+export function updateFeedbackStatus(id: string, status: string): Promise<void> {
+  return putRequest<void>(`/api/admin/feedback/${id}/status`, { status })
 }

@@ -311,3 +311,35 @@ export interface CheckinRecordEntry {
   nickname: string | null
   avatar_url: string | null
 }
+
+// ========== 意见反馈 ==========
+
+export interface FeedbackItem {
+  id: string
+  userId: string
+  userNickname: string
+  userAvatar: string | null
+  category: string
+  content: string
+  images: string[]
+  status: string
+  adminReply: string | null
+  repliedAt: string | null
+  repliedBy: string | null
+  createdAt: string
+}
+
+export interface FeedbackListResponse {
+  total: number
+  page: number
+  limit: number
+  data: FeedbackItem[]
+}
+
+export interface FeedbackDetail extends FeedbackItem {
+  user: {
+    nickname: string
+    avatarUrl: string | null
+    email: string | null
+  } | null
+}
