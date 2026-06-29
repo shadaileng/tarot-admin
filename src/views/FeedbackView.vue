@@ -24,6 +24,7 @@ function triggerSearch() {
 
 watch(keyword, triggerSearch)
 watch(statusFilter, () => { page.value = 1; doLoad() })
+watch(page, doLoad, { immediate: true })
 
 async function doLoad() {
   loading.value = true
