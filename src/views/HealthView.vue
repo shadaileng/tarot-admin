@@ -16,7 +16,7 @@ const { data, error, loading } = useHealth(5000)
     </div>
 
     <template v-else-if="data">
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
         <HealthCard label="服务状态" :value="data.status === 'ok' ? '正常' : '异常'" :color="data.status === 'ok' ? 'green' : 'red'" />
         <HealthCard
           label="Gemini API"
@@ -25,6 +25,25 @@ const { data, error, loading } = useHealth(5000)
         />
         <HealthCard label="总请求" :value="data.metrics.totalRequests" color="indigo" />
         <HealthCard label="平均耗时" :value="`${data.metrics.avgTotalMs}ms`" color="blue" />
+        <HealthCard label="当前模型" :value="data.model ?? '未配置'" :color="data.model ? 'purple' : 'gray'" />
+      </div>
+
+      <div v-if="data.detail" class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4">
+        <h4 class="text-sm font-medium text-red-600 dark:text-red-400 mb-1">错误详情</h4>
+        <p class="text-sm text-red-600 dark:text-red-400">{{ data.detail }}</p>
+      </div>
+
+      <div v-if="data.exhaustedModels?.length" class="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-xl p-4">
+        <h4 class="text-sm font-medium text-orange-600 dark:text-orange-400 mb-2">已耗尽模型</h4>
+        <div class="flex flex-wrap gap-2">
+          <span
+            v-for="model in data.exhaustedModels"
+            :key="model"
+            class="px-3 py-1 text-sm bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 rounded-full"
+          >
+            {{ model }}
+          </span>
+        </div>
       </div>
 
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">

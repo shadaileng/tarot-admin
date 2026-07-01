@@ -63,7 +63,13 @@ onMounted(async () => {
         </div>
         <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-4">
           <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">浏览器池</p>
-          <p class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ health.pool.available }} 可用 / {{ health.pool.maxPages }} 最大</p>
+          <p class="text-sm font-medium text-gray-900 dark:text-gray-100">
+            <span class="text-green-600 dark:text-green-400">{{ health.pool.available }} 可用</span>
+            <span class="text-gray-400 mx-1">/</span>
+            <span class="text-blue-600 dark:text-blue-400">{{ health.pool.active }} 活跃</span>
+            <span class="text-gray-400 mx-1">/</span>
+            <span class="text-yellow-600 dark:text-yellow-400">{{ health.pool.waiting }} 等待</span>
+          </p>
         </div>
         <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-4">
           <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">API 端点</p>

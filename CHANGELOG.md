@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.7.0] - 2026-07-01
+
+### Added
+
+- 仪表盘 StatusCard 显示当前 Gemini 模型名称
+- 仪表盘浏览器池状态补全 active/waiting 显示
+- 健康检查页面新增当前模型卡片
+- 健康检查页面新增错误详情和配额耗尽模型列表展示
+- 指标页面新增耗时统计卡片（总耗时/模板/资源/截图）
+- 指标页面新增分位数展示（P50/P95/P99）
+- 指标页面新增样本统计卡片
+
+### Changed
+
+- HealthResponse 类型增加 model/detail/exhaustedModels 字段
+- parsePrometheusMetrics 完善耗时和分位数解析
+- HealthCard 组件支持 purple/gray 颜色
+
 ## [2.4.1] - 2026-06-28
 
 ### Fixed

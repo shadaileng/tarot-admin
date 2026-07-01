@@ -9,6 +9,9 @@ export interface HealthResponse {
   status: string
   worker: string
   gemini: string
+  model: string | null
+  detail?: string
+  exhaustedModels?: string[]
   cache: {
     size: number
     maxSize: number

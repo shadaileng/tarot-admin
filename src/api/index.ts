@@ -130,7 +130,16 @@ export function parsePrometheusMetrics(raw: string): Partial<MetricsSnapshot> {
   const lines = raw.split('\n')
   for (const line of lines) {
     if (line.startsWith('#') || line.trim() === '') continue
-    const match = line.match(/^(\w+)\{?\}?\s+([\d.]+)/)
+    const matchWithLabel = line.match(/^(\w+)\{[^}]*quantile="([^"]+)"\}\s+([\d.]+)/)
+    if (matchWithLabel) {
+      const metricName = matchWithLabel[1]
+      const quantile = matchWithLabel[2]
+      const value = parseFloat(matchWithLabel[3])
+      const key = `${metricName}_p${quantile.replace('.', '')}`
+      result[key] = value
+      continue
+    }
+    const match = line.match(/^(\w+)\s+([\d.]+)/)
     if (match) {
       result[match[1]] = parseFloat(match[2])
     }
@@ -141,6 +150,32 @@ export function parsePrometheusMetrics(raw: string): Partial<MetricsSnapshot> {
     cacheMisses: result['poster_cache_misses_total'] ?? 0,
     cacheHitRate: result['poster_cache_hit_rate'] ?? 0,
     errorCount: result['poster_errors_total'] ?? 0,
+    avgTotalMs: result['poster_render_duration_ms_count'] > 0
+      ? (result['poster_render_duration_ms_sum'] ?? 0) / result['poster_render_duration_ms_count']
+      : 0,
+    avgTemplateMs: result['poster_template_duration_ms_count'] > 0
+      ? (result['poster_template_duration_ms_sum'] ?? 0) / result['poster_template_duration_ms_count']
+      : 0,
+    avgResourceMs: result['poster_resource_duration_ms_count'] > 0
+      ? (result['poster_resource_duration_ms_sum'] ?? 0) / result['poster_resource_duration_ms_count']
+      : 0,
+    avgScreenshotMs: result['poster_screenshot_duration_ms_count'] > 0
+      ? (result['poster_screenshot_duration_ms_sum'] ?? 0) / result['poster_screenshot_duration_ms_count']
+      : 0,
+    totalP50: result['poster_render_duration_ms_p50'] ?? 0,
+    totalP95: result['poster_render_duration_ms_p95'] ?? 0,
+    totalP99: result['poster_render_duration_ms_p99'] ?? 0,
+    templateP50: result['poster_template_duration_ms_p50'] ?? 0,
+    templateP95: result['poster_template_duration_ms_p95'] ?? 0,
+    templateP99: result['poster_template_duration_ms_p99'] ?? 0,
+    resourceP50: result['poster_resource_duration_ms_p50'] ?? 0,
+    resourceP95: result['poster_resource_duration_ms_p95'] ?? 0,
+    resourceP99: result['poster_resource_duration_ms_p99'] ?? 0,
+    screenshotP50: result['poster_screenshot_duration_ms_p50'] ?? 0,
+    screenshotP95: result['poster_screenshot_duration_ms_p95'] ?? 0,
+    screenshotP99: result['poster_screenshot_duration_ms_p99'] ?? 0,
+    sampleCount: result['poster_render_duration_ms_count'] ?? 0,
+    nonCacheSampleCount: result['poster_template_duration_ms_count'] ?? 0,
   }
 }
 

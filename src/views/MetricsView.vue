@@ -83,10 +83,76 @@ onMounted(() => {
         </div>
       </div>
 
-      <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-6">
-        <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-4">请求分布</h3>
-        <div class="h-64">
-          <Bar :data="chartData" :options="chartOptions" />
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5">
+          <p class="text-sm text-gray-500 dark:text-gray-400">平均总耗时</p>
+          <p class="text-3xl font-bold text-blue-600 dark:text-blue-400 mt-1">
+            {{ (metrics.avgTotalMs ?? 0).toFixed(0) }}ms
+          </p>
+          <p class="text-xs text-gray-400 mt-1">
+            P50: {{ (metrics.totalP50 ?? 0).toFixed(0) }}ms |
+            P95: {{ (metrics.totalP95 ?? 0).toFixed(0) }}ms
+          </p>
+        </div>
+        <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5">
+          <p class="text-sm text-gray-500 dark:text-gray-400">平均模板耗时</p>
+          <p class="text-3xl font-bold text-purple-600 dark:text-purple-400 mt-1">
+            {{ (metrics.avgTemplateMs ?? 0).toFixed(0) }}ms
+          </p>
+          <p class="text-xs text-gray-400 mt-1">
+            P50: {{ (metrics.templateP50 ?? 0).toFixed(0) }}ms |
+            P95: {{ (metrics.templateP95 ?? 0).toFixed(0) }}ms
+          </p>
+        </div>
+        <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5">
+          <p class="text-sm text-gray-500 dark:text-gray-400">平均资源耗时</p>
+          <p class="text-3xl font-bold text-yellow-600 dark:text-yellow-400 mt-1">
+            {{ (metrics.avgResourceMs ?? 0).toFixed(0) }}ms
+          </p>
+          <p class="text-xs text-gray-400 mt-1">
+            P50: {{ (metrics.resourceP50 ?? 0).toFixed(0) }}ms |
+            P95: {{ (metrics.resourceP95 ?? 0).toFixed(0) }}ms
+          </p>
+        </div>
+        <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5">
+          <p class="text-sm text-gray-500 dark:text-gray-400">平均截图耗时</p>
+          <p class="text-3xl font-bold text-green-600 dark:text-green-400 mt-1">
+            {{ (metrics.avgScreenshotMs ?? 0).toFixed(0) }}ms
+          </p>
+          <p class="text-xs text-gray-400 mt-1">
+            P50: {{ (metrics.screenshotP50 ?? 0).toFixed(0) }}ms |
+            P95: {{ (metrics.screenshotP95 ?? 0).toFixed(0) }}ms
+          </p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5">
+          <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">请求分布</p>
+          <div class="h-64">
+            <Bar :data="chartData" :options="chartOptions" />
+          </div>
+        </div>
+        <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5">
+          <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">样本统计</p>
+          <div class="space-y-4">
+            <div class="flex items-center justify-between">
+              <span class="text-sm text-gray-600 dark:text-gray-400">总样本</span>
+              <span class="text-lg font-bold text-indigo-600 dark:text-indigo-400">{{ metrics.sampleCount ?? 0 }}</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-sm text-gray-600 dark:text-gray-400">非缓存样本</span>
+              <span class="text-lg font-bold text-blue-600 dark:text-blue-400">{{ metrics.nonCacheSampleCount ?? 0 }}</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-sm text-gray-600 dark:text-gray-400">缓存命中</span>
+              <span class="text-lg font-bold text-green-600 dark:text-green-400">{{ metrics.cacheHits ?? 0 }}</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-sm text-gray-600 dark:text-gray-400">缓存未命中</span>
+              <span class="text-lg font-bold text-yellow-600 dark:text-yellow-400">{{ metrics.cacheMisses ?? 0 }}</span>
+            </div>
+          </div>
         </div>
       </div>
     </template>

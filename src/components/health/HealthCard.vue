@@ -2,7 +2,7 @@
 defineProps<{
   label: string
   value: string | number
-  color?: 'indigo' | 'green' | 'yellow' | 'orange' | 'red' | 'blue'
+  color?: 'indigo' | 'green' | 'yellow' | 'orange' | 'red' | 'blue' | 'purple' | 'gray'
 }>()
 
 const dotColor: Record<string, string> = {
@@ -12,6 +12,8 @@ const dotColor: Record<string, string> = {
   orange: 'bg-orange-500',
   red: 'bg-red-500',
   blue: 'bg-blue-500',
+  purple: 'bg-purple-500',
+  gray: 'bg-gray-500',
 }
 </script>
 
