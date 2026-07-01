@@ -38,15 +38,13 @@ export interface LogEntry {
   target: string
   status_code: number
   duration_ms: number
+  template_ms: number | null
+  resource_ms: number | null
+  screenshot_ms: number | null
+  cache_hit: number
   ip_address: string | null
-  question: string | null
-  cards_json: string | null
-  reading: string | null
-  model: string | null
-  incomplete: number
   is_error: number
   error_msg: string | null
-  // 用户信息（来自后端 JOIN 查询）
   user_id: string | null
   user_nickname: string | null
   user_email: string | null
@@ -59,6 +57,28 @@ export interface LogListResponse {
   page: number
   limit: number
   data: LogEntry[]
+}
+
+export interface ReadingLogEntry {
+  id: string
+  created_at: string
+  user_id: string | null
+  question: string | null
+  cards_json: string | null
+  reading: string | null
+  model: string | null
+  incomplete: number | null
+  user_nickname: string | null
+  user_email: string | null
+  user_avatar: string | null
+  login_type: string | null
+}
+
+export interface ReadingLogListResponse {
+  total: number
+  page: number
+  limit: number
+  data: ReadingLogEntry[]
 }
 
 export interface MetricsSnapshot {

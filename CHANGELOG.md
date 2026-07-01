@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.8.0] - 2026-07-01
+
+### Added
+
+- 新增解读日志页面（ReadingLogsView），查看 AI 解读的详细日志记录
+- 新增 ReadingLogTable 和 ReadingLogDetail 组件
+- 新增 ReadingLogEntry/ReadingLogListResponse 类型定义
+- 新增 fetchReadingLogs/fetchReadingLogById API 函数
+
+### Changed
+
+- 请求日志 LogTable 改为展示分阶段耗时（template_ms/resource_ms/screenshot_ms）和缓存状态
+- LogDetail 移除解读相关字段，专注请求信息展示
+- 路由 /logs 标题改为"请求日志"，新增 /reading-logs 路由
+- 侧边栏菜单"日志"改名为"请求日志"，新增"解读日志"菜单项
+
 ## [2.7.0] - 2026-07-01
 
 ### Added

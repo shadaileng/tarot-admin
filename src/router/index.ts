@@ -26,7 +26,13 @@ const router = createRouter({
       path: '/logs',
       name: 'logs',
       component: () => import('@/views/LogsView.vue'),
-      meta: { title: '日志' },
+      meta: { title: '请求日志' },
+    },
+    {
+      path: '/reading-logs',
+      name: 'reading-logs',
+      component: () => import('@/views/ReadingLogsView.vue'),
+      meta: { title: '解读日志' },
     },
     {
       path: '/health',

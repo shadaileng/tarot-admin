@@ -1,4 +1,4 @@
-import type { ServiceInfo, HealthResponse, LogListResponse, LogEntry, MetricsSnapshot, ConfigResponse, UserListResponse, AdminListResponse, AdminEntry, CreateAdminRequest, UpdateAdminRequest, ResetPasswordRequest, ApiResponse, LevelDefinitionEntry, TaskDefinitionEntry, CreateTaskDefinitionRequest, UpdateTaskDefinitionRequest, UserStatsEntry, TrendResponse, AdminInviteListResponse, CheckinStatsResponse, FeedbackListResponse, FeedbackDetail, AuditLogListResponse } from '@/types'
+import type { ServiceInfo, HealthResponse, LogListResponse, LogEntry, ReadingLogListResponse, ReadingLogEntry, MetricsSnapshot, ConfigResponse, UserListResponse, AdminListResponse, AdminEntry, CreateAdminRequest, UpdateAdminRequest, ResetPasswordRequest, ApiResponse, LevelDefinitionEntry, TaskDefinitionEntry, CreateTaskDefinitionRequest, UpdateTaskDefinitionRequest, UserStatsEntry, TrendResponse, AdminInviteListResponse, CheckinStatsResponse, FeedbackListResponse, FeedbackDetail, AuditLogListResponse } from '@/types'
 import { useAuth } from '@/composables/useAuth'
 
 const BASE = import.meta.env.VITE_API_BASE_URL
@@ -115,6 +115,18 @@ export function fetchLogs(params: { page?: number; limit?: number; target?: stri
 
 export function fetchLogById(id: string): Promise<LogEntry> {
   return getRequest<LogEntry>(`/api/logs/${id}`)
+}
+
+export function fetchReadingLogs(params: { page?: number; limit?: number } = {}): Promise<ReadingLogListResponse> {
+  const query = new URLSearchParams()
+  if (params.page) query.set('page', String(params.page))
+  if (params.limit) query.set('limit', String(params.limit))
+  const qs = query.toString()
+  return getRequest<ReadingLogListResponse>(`/api/reading-logs${qs ? `?${qs}` : ''}`)
+}
+
+export function fetchReadingLogById(id: string): Promise<ReadingLogEntry> {
+  return getRequest<ReadingLogEntry>(`/api/reading-logs/${id}`)
 }
 
 export async function fetchMetricsRaw(): Promise<string> {
