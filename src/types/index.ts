@@ -343,3 +343,27 @@ export interface FeedbackDetail extends FeedbackItem {
     email: string | null
   } | null
 }
+
+// ========== 审计日志 ==========
+
+export interface AuditLogEntry {
+  id: string
+  created_at: string
+  actor_type: string
+  actor_id: string | null
+  actor_name: string | null
+  action: string
+  target_type: string | null
+  target_id: string | null
+  target_name: string | null
+  old_value: string | null
+  new_value: string | null
+  ip_address: string | null
+}
+
+export interface AuditLogListResponse {
+  total: number
+  page: number
+  limit: number
+  data: AuditLogEntry[]
+}

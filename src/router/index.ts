@@ -100,6 +100,12 @@ const router = createRouter({
       component: () => import('@/views/FeedbackView.vue'),
       meta: { title: '意见反馈' },
     },
+    {
+      path: '/audit-logs',
+      name: 'audit-logs',
+      component: () => import('@/views/AuditLogsView.vue'),
+      meta: { title: '操作日志' },
+    },
   ],
 })
 

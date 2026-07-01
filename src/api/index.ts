@@ -1,4 +1,4 @@
-import type { ServiceInfo, HealthResponse, LogListResponse, LogEntry, MetricsSnapshot, ConfigResponse, UserListResponse, AdminListResponse, AdminEntry, CreateAdminRequest, UpdateAdminRequest, ResetPasswordRequest, ApiResponse, LevelDefinitionEntry, TaskDefinitionEntry, CreateTaskDefinitionRequest, UpdateTaskDefinitionRequest, UserStatsEntry, TrendResponse, AdminInviteListResponse, CheckinStatsResponse, FeedbackListResponse, FeedbackDetail } from '@/types'
+import type { ServiceInfo, HealthResponse, LogListResponse, LogEntry, MetricsSnapshot, ConfigResponse, UserListResponse, AdminListResponse, AdminEntry, CreateAdminRequest, UpdateAdminRequest, ResetPasswordRequest, ApiResponse, LevelDefinitionEntry, TaskDefinitionEntry, CreateTaskDefinitionRequest, UpdateTaskDefinitionRequest, UserStatsEntry, TrendResponse, AdminInviteListResponse, CheckinStatsResponse, FeedbackListResponse, FeedbackDetail, AuditLogListResponse } from '@/types'
 import { useAuth } from '@/composables/useAuth'
 
 const BASE = import.meta.env.VITE_API_BASE_URL
@@ -332,4 +332,31 @@ export function replyFeedback(id: string, reply: string): Promise<void> {
 
 export function updateFeedbackStatus(id: string, status: string): Promise<void> {
   return putRequest<void>(`/api/admin/feedback/${id}/status`, { status })
+}
+
+// ========== 审计日志 API ==========
+
+export function fetchAuditLogs(params: {
+  page?: number
+  limit?: number
+  actorType?: string
+  action?: string
+  targetType?: string
+  startDate?: string
+  endDate?: string
+} = {}): Promise<AuditLogListResponse> {
+  const query = new URLSearchParams()
+  if (params.page) query.set('page', String(params.page))
+  if (params.limit) query.set('limit', String(params.limit))
+  if (params.actorType) query.set('actorType', params.actorType)
+  if (params.action) query.set('action', params.action)
+  if (params.targetType) query.set('targetType', params.targetType)
+  if (params.startDate) query.set('startDate', params.startDate)
+  if (params.endDate) query.set('endDate', params.endDate)
+  const qs = query.toString()
+  return getRequest<AuditLogListResponse>(`/api/admin/audit-logs${qs ? `?${qs}` : ''}`)
+}
+
+export function cleanAuditLogs(retentionDays?: number): Promise<{ message: string; deleted: number; retentionDays: number }> {
+  return postRequest<{ message: string; deleted: number; retentionDays: number }>('/api/admin/audit-logs/clean', { retentionDays })
 }
