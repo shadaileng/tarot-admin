@@ -3,27 +3,26 @@ import { ref, onMounted } from 'vue'
 import { fetchConfig, updateConfigItem } from '@/api'
 import type { ConfigGroup, ConfigItem } from '@/types'
 import { useAuth } from '@/composables/useAuth'
+import { useToast } from '@/composables/useToast'
+
+const { showToast } = useToast()
 
 const { admin } = useAuth()
 
 const groups = ref<ConfigGroup[]>([])
 const loading = ref(true)
-const error = ref('')
 
 const editingKey = ref<string | null>(null)
 const editValue = ref('')
 const saving = ref(false)
-const saveMessage = ref('')
-const saveMessageType = ref<'success' | 'error'>('success')
 
 async function loadConfig() {
   try {
     loading.value = true
-    error.value = ''
     const res = await fetchConfig()
     groups.value = res.groups
   } catch (e: any) {
-    error.value = e.message || '加载失败'
+    showToast(e.message || '加载失败', 'error')
   } finally {
     loading.value = false
   }
@@ -43,15 +42,11 @@ async function saveEdit(key: string) {
   try {
     saving.value = true
     await updateConfigItem(key, editValue.value)
-    saveMessage.value = '保存成功'
-    saveMessageType.value = 'success'
+    showToast('保存成功', 'success')
     editingKey.value = null
     await loadConfig()
-    setTimeout(() => { saveMessage.value = '' }, 2000)
   } catch (e: any) {
-    saveMessage.value = e.message || '保存失败'
-    saveMessageType.value = 'error'
-    setTimeout(() => { saveMessage.value = '' }, 3000)
+    showToast(e.message || '保存失败', 'error')
   } finally {
     saving.value = false
   }
@@ -64,20 +59,7 @@ onMounted(loadConfig)
   <div class="space-y-6">
     <div v-if="loading && groups.length === 0" class="text-gray-400 dark:text-gray-500 text-sm py-12 text-center">加载中...</div>
 
-    <div v-else-if="error" class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4 text-red-600 dark:text-red-400 text-sm">
-      {{ error }}
-    </div>
-
     <template v-else>
-      <div v-if="saveMessage" :class="[
-        'rounded-xl p-4 text-sm transition-all',
-        saveMessageType === 'success'
-          ? 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-600 dark:text-green-400'
-          : 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400'
-      ]">
-        {{ saveMessage }}
-      </div>
-
       <div v-for="group in groups" :key="group.name" class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
           <h3 class="font-semibold text-gray-900 dark:text-gray-100">{{ group.name }}</h3>

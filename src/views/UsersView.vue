@@ -2,6 +2,9 @@
 import { ref, watch, computed } from 'vue'
 import type { UserEntry, UserListResponse } from '@/types'
 import { fetchUsers, unbindEmail, deleteUser, restoreUser } from '@/api'
+import { useToast } from '@/composables/useToast'
+
+const { showToast } = useToast()
 
 const tab = ref<'normal' | 'deleted'>('normal')
 const keyword = ref('')
@@ -12,18 +15,8 @@ const loading = ref(true)
 const selectedUser = ref<UserEntry | null>(null)
 
 const confirmTarget = ref<UserEntry | null>(null)
-const toast = ref<{ message: string; type: 'success' | 'error' } | null>(null)
-let toastTimer: ReturnType<typeof setTimeout> | null = null
 
 let debounceTimer: ReturnType<typeof setTimeout> | null = null
-
-function showToast(message: string, type: 'success' | 'error') {
-  if (toastTimer) clearTimeout(toastTimer)
-  toast.value = { message, type }
-  toastTimer = setTimeout(() => {
-    toast.value = null
-  }, 2000)
-}
 
 function doLoad() {
   loading.value = true
@@ -360,18 +353,6 @@ async function handleRestore(user: UserEntry) {
       </div>
     </Teleport>
 
-    <!-- Toast -->
-    <Teleport to="body">
-      <div
-        v-if="toast"
-        class="fixed top-4 right-4 z-50 px-4 py-3 rounded-lg shadow-lg text-sm font-medium transition-all"
-        :class="toast.type === 'success'
-          ? 'bg-green-600 text-white'
-          : 'bg-red-600 text-white'"
-      >
-        {{ toast.message }}
-      </div>
-    </Teleport>
   </div>
 
     <!-- 详情弹窗 -->

@@ -3,12 +3,13 @@ import { ref, computed, onMounted } from 'vue'
 import { useAuth } from '@/composables/useAuth'
 import type { PageSectionEntry } from '@/types'
 import { fetchPageSections, updatePageSection } from '@/api'
+import { useToast } from '@/composables/useToast'
+
+const { showToast } = useToast()
 
 const { admin } = useAuth()
 const sections = ref<PageSectionEntry[]>([])
 const loading = ref(true)
-const errorMsg = ref('')
-const successMsg = ref('')
 
 const isReadonly = computed(() => admin.value?.role === 'readonly')
 
@@ -17,12 +18,11 @@ const drawSections = computed(() => sections.value.filter(s => s.pageKey === 'dr
 
 async function loadSections() {
   loading.value = true
-  errorMsg.value = ''
   try {
     const res = await fetchPageSections()
     sections.value = res.sections
   } catch (err: any) {
-    errorMsg.value = err.message || '加载页面配置失败'
+    showToast(err.message || '加载页面配置失败', 'error')
   } finally {
     loading.value = false
   }
@@ -30,15 +30,12 @@ async function loadSections() {
 
 async function toggleSection(section: PageSectionEntry) {
   if (isReadonly.value) return
-  errorMsg.value = ''
-  successMsg.value = ''
   try {
     await updatePageSection(section.id, !section.visible)
     section.visible = !section.visible
-    successMsg.value = '已更新'
-    setTimeout(() => { successMsg.value = '' }, 2000)
+    showToast('已更新', 'success')
   } catch (err: any) {
-    errorMsg.value = err.message || '更新失败'
+    showToast(err.message || '更新失败', 'error')
   }
 }
 
@@ -49,14 +46,6 @@ onMounted(loadSections)
   <div class="space-y-6">
     <div class="flex items-center justify-between">
       <h2 class="text-lg font-semibold text-gray-900 dark:text-white">页面管理</h2>
-    </div>
-
-    <div v-if="errorMsg" class="px-4 py-3 bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded-lg text-sm">
-      {{ errorMsg }}
-    </div>
-
-    <div v-if="successMsg" class="px-4 py-3 bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-lg text-sm">
-      {{ successMsg }}
     </div>
 
     <div v-if="isReadonly" class="px-4 py-3 bg-yellow-50 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 rounded-lg text-sm">

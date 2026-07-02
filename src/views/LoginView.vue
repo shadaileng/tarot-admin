@@ -2,6 +2,9 @@
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuth } from '@/composables/useAuth'
+import { useToast } from '@/composables/useToast'
+
+const { showToast } = useToast()
 
 const router = useRouter()
 const { login, isLoggedIn, admin } = useAuth()
@@ -17,17 +20,15 @@ if (isLoggedIn.value) {
 
 const form = reactive({ username: '', password: '' })
 const loading = ref(false)
-const errorMsg = ref('')
 
 async function handleLogin() {
   if (!form.username || !form.password) {
-    errorMsg.value = '请输入用户名和密码'
+    showToast('请输入用户名和密码', 'error')
     return
   }
   if (loading.value) return
 
   loading.value = true
-  errorMsg.value = ''
 
   try {
     const adminInfo = await login(form.username, form.password)
@@ -37,7 +38,7 @@ async function handleLogin() {
       router.replace('/')
     }
   } catch (err: any) {
-    errorMsg.value = err.message || '登录失败，请重试'
+    showToast(err.message || '登录失败，请重试', 'error')
   } finally {
     loading.value = false
   }
@@ -84,14 +85,6 @@ async function handleLogin() {
               placeholder="请输入密码"
               class="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-2.5 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow"
             />
-          </div>
-
-          <!-- 错误提示 -->
-          <div
-            v-if="errorMsg"
-            class="rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 px-4 py-3 text-sm text-red-700 dark:text-red-400"
-          >
-            {{ errorMsg }}
           </div>
 
           <!-- 登录按钮 -->

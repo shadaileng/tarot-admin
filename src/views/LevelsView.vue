@@ -3,11 +3,13 @@ import { ref, onMounted } from 'vue'
 import { useAuth } from '@/composables/useAuth'
 import type { LevelDefinitionEntry } from '@/types'
 import { fetchLevelDefinitions, updateLevelDefinition } from '@/api'
+import { useToast } from '@/composables/useToast'
+
+const { showToast } = useToast()
 
 const { admin } = useAuth()
 const levels = ref<LevelDefinitionEntry[]>([])
 const loading = ref(true)
-const errorMsg = ref('')
 const editingLevel = ref<LevelDefinitionEntry | null>(null)
 const showEdit = ref(false)
 const editForm = ref<LevelDefinitionEntry>({} as LevelDefinitionEntry)
@@ -15,12 +17,11 @@ const saving = ref(false)
 
 async function loadLevels() {
   loading.value = true
-  errorMsg.value = ''
   try {
     const res = await fetchLevelDefinitions()
     levels.value = res.levels
   } catch (err: any) {
-    errorMsg.value = err.message || '加载等级配置失败'
+    showToast(err.message || '加载等级配置失败', 'error')
   } finally {
     loading.value = false
   }
@@ -37,10 +38,11 @@ async function saveLevel() {
   saving.value = true
   try {
     await updateLevelDefinition(editingLevel.value.level, editForm.value)
+    showToast('保存成功', 'success')
     showEdit.value = false
     await loadLevels()
   } catch (err: any) {
-    errorMsg.value = err.message || '保存失败'
+    showToast(err.message || '保存失败', 'error')
   } finally {
     saving.value = false
   }
@@ -53,10 +55,6 @@ onMounted(loadLevels)
   <div class="space-y-4">
     <div class="flex items-center justify-between">
       <h2 class="text-lg font-semibold text-gray-900 dark:text-white">等级配置管理</h2>
-    </div>
-
-    <div v-if="errorMsg" class="px-4 py-3 bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded-lg text-sm">
-      {{ errorMsg }}
     </div>
 
     <div v-if="loading" class="text-center py-12 text-gray-500">加载中...</div>

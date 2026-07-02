@@ -3,17 +3,20 @@ import { useHealth } from '@/composables/useHealth'
 import HealthCard from '@/components/health/HealthCard.vue'
 import CacheStatus from '@/components/health/CacheStatus.vue'
 import PoolStatus from '@/components/health/PoolStatus.vue'
+import { useToast } from '@/composables/useToast'
+import { watch } from 'vue'
 
 const { data, error, loading } = useHealth(5000)
+const { showToast } = useToast()
+
+watch(error, (val) => {
+  if (val) showToast(val, 'error')
+})
 </script>
 
 <template>
   <div class="space-y-6">
     <div v-if="loading && !data" class="text-gray-400 dark:text-gray-500 text-sm py-12 text-center">加载中...</div>
-
-    <div v-else-if="error" class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4 text-red-600 dark:text-red-400 text-sm">
-      获取健康数据失败: {{ error }}
-    </div>
 
     <template v-else-if="data">
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">

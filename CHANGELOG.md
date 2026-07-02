@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.10.0] - 2026-07-02
+
+### Added
+
+- 新增全局 Toast 通知系统（`useToast` composable + `ToastContainer` 组件）
+- 所有页面内联错误/成功提示横幅统一替换为右上角 Toast 浮层，自动 2.5 秒消失
+- 弹窗（Modal）内的错误提示保持原位不变
+
+### Changed
+
+- `HealthView.vue` 错误提示从内联横幅改为 Toast 显示
+
 ## [2.9.3] - 2026-07-02
 
 ### Fixed

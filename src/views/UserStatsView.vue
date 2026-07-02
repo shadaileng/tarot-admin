@@ -3,6 +3,9 @@ import { ref, watch, computed, onMounted } from 'vue'
 import { useAuth } from '@/composables/useAuth'
 import type { UserStatsEntry } from '@/types'
 import { fetchUserStatsList, updateUserPoints, resetUserQuota, clearUserInvite } from '@/api'
+import { useToast } from '@/composables/useToast'
+
+const { showToast } = useToast()
 
 const { admin } = useAuth()
 const data = ref<UserStatsEntry[]>([])
@@ -11,7 +14,6 @@ const page = ref(1)
 const limit = ref(20)
 const keyword = ref('')
 const loading = ref(true)
-const errorMsg = ref('')
 
 const showAdjust = ref(false)
 const adjustTarget = ref<UserStatsEntry | null>(null)
@@ -22,7 +24,6 @@ let debounceTimer: ReturnType<typeof setTimeout> | null = null
 
 async function doLoad() {
   loading.value = true
-  errorMsg.value = ''
   try {
     const res = await fetchUserStatsList({
       page: page.value,
@@ -32,7 +33,7 @@ async function doLoad() {
     data.value = res.data
     total.value = res.total
   } catch (err: any) {
-    errorMsg.value = err.message || '加载用户统计失败'
+    showToast(err.message || '加载用户统计失败', 'error')
   } finally {
     loading.value = false
   }
@@ -65,7 +66,7 @@ async function doAdjust() {
     showAdjust.value = false
     await doLoad()
   } catch (err: any) {
-    errorMsg.value = err.message || '调整积分失败'
+    showToast(err.message || '调整积分失败', 'error')
   } finally {
     adjusting.value = false
   }
@@ -76,7 +77,7 @@ async function doResetQuota(userId: string) {
     await resetUserQuota(userId)
     await doLoad()
   } catch (err: any) {
-    errorMsg.value = err.message || '重置额度失败'
+    showToast(err.message || '重置额度失败', 'error')
   }
 }
 
@@ -85,7 +86,7 @@ async function doClearInvite(userId: string) {
     await clearUserInvite(userId)
     await doLoad()
   } catch (err: any) {
-    errorMsg.value = err.message || '清除邀请绑定失败'
+    showToast(err.message || '清除邀请绑定失败', 'error')
   }
 }
 
@@ -104,10 +105,6 @@ function formatDate(dateStr: string | null): string {
         <input v-model="keyword" placeholder="搜索昵称/邮箱/ID"
           class="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white w-48" />
       </div>
-    </div>
-
-    <div v-if="errorMsg" class="px-4 py-3 bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded-lg text-sm">
-      {{ errorMsg }}
     </div>
 
     <div v-if="loading" class="text-center py-12 text-gray-500">加载中...</div>

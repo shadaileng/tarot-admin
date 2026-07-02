@@ -3,6 +3,9 @@ import { ref, watch, computed } from 'vue'
 import { useAuth } from '@/composables/useAuth'
 import type { AdminEntry, AdminListResponse } from '@/types'
 import { fetchAdmins, createAdmin, updateAdmin, deleteAdmin, resetAdminPassword } from '@/api'
+import { useToast } from '@/composables/useToast'
+
+const { showToast } = useToast()
 
 const { admin: currentAdmin } = useAuth()
 
@@ -12,23 +15,21 @@ const page = ref(1)
 const pageSize = ref(20)
 const data = ref<AdminListResponse | null>(null)
 const loading = ref(true)
-const errorMsg = ref('')
 
 let debounceTimer: ReturnType<typeof setTimeout> | null = null
 
 function doLoad() {
   loading.value = true
-  errorMsg.value = ''
   fetchAdmins({ page: page.value, pageSize: pageSize.value, search: search.value || undefined })
     .then((res) => {
       if (res.success) {
         data.value = res.data
       } else {
-        errorMsg.value = (res as any).error || '加载失败'
+        showToast((res as any).error || '加载失败', 'error')
       }
     })
     .catch((err: Error) => {
-      errorMsg.value = err.message || '加载管理员列表失败'
+      showToast(err.message || '加载管理员列表失败', 'error')
     })
     .finally(() => {
       loading.value = false
@@ -246,14 +247,6 @@ async function handleReset() {
         </svg>
         新建管理员
       </button>
-    </div>
-
-    <!-- 错误提示 -->
-    <div
-      v-if="errorMsg"
-      class="px-4 py-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-700 dark:text-red-400"
-    >
-      {{ errorMsg }}
     </div>
 
     <!-- 表格 -->

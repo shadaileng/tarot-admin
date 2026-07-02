@@ -2,6 +2,9 @@
 import { ref, watch, computed } from 'vue'
 import type { AuditLogEntry } from '@/types'
 import { fetchAuditLogs, cleanAuditLogs } from '@/api'
+import { useToast } from '@/composables/useToast'
+
+const { showToast } = useToast()
 
 const data = ref<AuditLogEntry[]>([])
 const total = ref(0)
@@ -12,8 +15,6 @@ const actorTypeFilter = ref('')
 const startDate = ref('')
 const endDate = ref('')
 const loading = ref(true)
-const errorMsg = ref('')
-const successMsg = ref('')
 
 const showDetail = ref(false)
 const detailRow = ref<AuditLogEntry | null>(null)
@@ -68,8 +69,6 @@ const ACTOR_TYPE_LABELS: Record<string, string> = {
 
 async function doLoad() {
   loading.value = true
-  errorMsg.value = ''
-  successMsg.value = ''
   try {
     const res = await fetchAuditLogs({
       page: page.value,
@@ -82,7 +81,7 @@ async function doLoad() {
     data.value = res.data
     total.value = res.total
   } catch (err: any) {
-    errorMsg.value = err.message || '加载失败'
+    showToast(err.message || '加载失败', 'error')
   } finally {
     loading.value = false
   }
@@ -155,10 +154,10 @@ async function doClean() {
   try {
     const res = await cleanAuditLogs()
     showCleanConfirm.value = false
-    successMsg.value = res.message
+    showToast(res.message, 'success')
     await doLoad()
   } catch (err: any) {
-    errorMsg.value = err.message || '清理失败'
+    showToast(err.message || '清理失败', 'error')
   }
 }
 </script>
@@ -191,9 +190,6 @@ async function doClean() {
         </button>
       </div>
     </div>
-
-    <div v-if="errorMsg" class="px-4 py-3 bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded-lg text-sm">{{ errorMsg }}</div>
-    <div v-if="successMsg" class="px-4 py-3 bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-lg text-sm">{{ successMsg }}</div>
 
     <div v-if="loading" class="text-center py-12 text-gray-500">加载中...</div>
 

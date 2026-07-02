@@ -2,6 +2,9 @@
 import { ref, watch, computed } from 'vue'
 import { fetchFeedbackList, fetchFeedbackDetail, replyFeedback, updateFeedbackStatus } from '@/api'
 import type { FeedbackItem, FeedbackDetail } from '@/types'
+import { useToast } from '@/composables/useToast'
+
+const { showToast } = useToast()
 
 const data = ref<FeedbackItem[]>([])
 const total = ref(0)
@@ -10,7 +13,6 @@ const limit = 20
 const keyword = ref('')
 const statusFilter = ref('')
 const loading = ref(true)
-const errorMsg = ref('')
 
 let debounceTimer: ReturnType<typeof setTimeout> | null = null
 
@@ -28,7 +30,6 @@ watch(page, doLoad, { immediate: true })
 
 async function doLoad() {
   loading.value = true
-  errorMsg.value = ''
   try {
     const res = await fetchFeedbackList({
       page: page.value,
@@ -39,7 +40,7 @@ async function doLoad() {
     data.value = res.data
     total.value = res.total
   } catch (err: any) {
-    errorMsg.value = err.message || '加载失败'
+    showToast(err.message || '加载失败', 'error')
   } finally {
     loading.value = false
   }
@@ -59,7 +60,7 @@ async function openDetail(item: FeedbackItem) {
     replyText.value = ''
     showDetail.value = true
   } catch (err: any) {
-    errorMsg.value = err.message || '加载详情失败'
+    showToast(err.message || '加载详情失败', 'error')
   }
 }
 
@@ -77,7 +78,7 @@ async function handleReply() {
     await doLoad()
     closeDetail()
   } catch (err: any) {
-    errorMsg.value = err.message || '回复失败'
+    showToast(err.message || '回复失败', 'error')
   } finally {
     submitting.value = false
   }
@@ -90,7 +91,7 @@ async function handleClose() {
     await doLoad()
     closeDetail()
   } catch (err: any) {
-    errorMsg.value = err.message || '操作失败'
+    showToast(err.message || '操作失败', 'error')
   }
 }
 
@@ -139,10 +140,6 @@ function previewImage(url: string) {
         </select>
         <span class="text-sm text-gray-500 dark:text-gray-400">共 {{ total }} 条</span>
       </div>
-    </div>
-
-    <div v-if="errorMsg" class="p-3 text-sm text-red-600 bg-red-50 dark:bg-red-900/20 dark:text-red-400 rounded-lg">
-      {{ errorMsg }}
     </div>
 
     <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">

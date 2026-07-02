@@ -3,11 +3,13 @@ import { ref, watch, computed, onMounted } from 'vue'
 import { useAuth } from '@/composables/useAuth'
 import type { TaskDefinitionEntry, CreateTaskDefinitionRequest, UpdateTaskDefinitionRequest } from '@/types'
 import { fetchTaskDefinitions, createTaskDefinition, updateTaskDefinition } from '@/api'
+import { useToast } from '@/composables/useToast'
+
+const { showToast } = useToast()
 
 const { admin } = useAuth()
 const tasks = ref<TaskDefinitionEntry[]>([])
 const loading = ref(true)
-const errorMsg = ref('')
 
 const showCreate = ref(false)
 const showEdit = ref(false)
@@ -32,12 +34,11 @@ const editForm = ref<UpdateTaskDefinitionRequest>({})
 
 async function loadTasks() {
   loading.value = true
-  errorMsg.value = ''
   try {
     const res = await fetchTaskDefinitions()
     tasks.value = res.tasks
   } catch (err: any) {
-    errorMsg.value = err.message || '加载任务定义失败'
+    showToast(err.message || '加载任务定义失败', 'error')
   } finally {
     loading.value = false
   }
@@ -51,10 +52,11 @@ async function doCreate() {
   saving.value = true
   try {
     await createTaskDefinition(createForm.value)
+    showToast('创建成功', 'success')
     showCreate.value = false
     await loadTasks()
   } catch (err: any) {
-    errorMsg.value = err.message || '创建失败'
+    showToast(err.message || '创建失败', 'error')
   } finally {
     saving.value = false
   }
@@ -82,10 +84,11 @@ async function doEdit() {
   saving.value = true
   try {
     await updateTaskDefinition(editTarget.value.id, editForm.value)
+    showToast('保存成功', 'success')
     showEdit.value = false
     await loadTasks()
   } catch (err: any) {
-    errorMsg.value = err.message || '保存失败'
+    showToast(err.message || '保存失败', 'error')
   } finally {
     saving.value = false
   }
@@ -106,10 +109,6 @@ onMounted(loadTasks)
         class="px-4 py-2 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
         + 新建任务
       </button>
-    </div>
-
-    <div v-if="errorMsg" class="px-4 py-3 bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded-lg text-sm">
-      {{ errorMsg }}
     </div>
 
     <div v-if="loading" class="text-center py-12 text-gray-500">加载中...</div>

@@ -3,6 +3,9 @@ import { ref, watch, computed, onMounted } from 'vue'
 import { useAuth } from '@/composables/useAuth'
 import type { AdminInviteRecord } from '@/types'
 import { fetchAdminInviteRecords, completeInviteRecord, deleteInviteRecord } from '@/api'
+import { useToast } from '@/composables/useToast'
+
+const { showToast } = useToast()
 
 const { admin } = useAuth()
 const data = ref<AdminInviteRecord[]>([])
@@ -12,13 +15,11 @@ const limit = ref(20)
 const status = ref('')
 const keyword = ref('')
 const loading = ref(true)
-const errorMsg = ref('')
 const showDeleteConfirm = ref(false)
 const deleteTarget = ref<AdminInviteRecord | null>(null)
 
 async function doLoad() {
   loading.value = true
-  errorMsg.value = ''
   try {
     const res = await fetchAdminInviteRecords({
       page: page.value,
@@ -29,7 +30,7 @@ async function doLoad() {
     data.value = res.data
     total.value = res.total
   } catch (err: any) {
-    errorMsg.value = err.message || '加载失败'
+    showToast(err.message || '加载失败', 'error')
   } finally {
     loading.value = false
   }
@@ -49,9 +50,10 @@ watch([page, status], doLoad, { immediate: true })
 async function doComplete(id: string) {
   try {
     await completeInviteRecord(id)
+    showToast('操作成功', 'success')
     await doLoad()
   } catch (err: any) {
-    errorMsg.value = err.message || '操作失败'
+    showToast(err.message || '操作失败', 'error')
   }
 }
 
@@ -64,11 +66,12 @@ async function doDelete() {
   if (!deleteTarget.value) return
   try {
     await deleteInviteRecord(deleteTarget.value.id)
+    showToast('删除成功', 'success')
     showDeleteConfirm.value = false
     deleteTarget.value = null
     await doLoad()
   } catch (err: any) {
-    errorMsg.value = err.message || '删除失败'
+    showToast(err.message || '删除失败', 'error')
   }
 }
 
@@ -95,8 +98,6 @@ function formatDate(d: string | null) {
           class="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white w-48" />
       </div>
     </div>
-
-    <div v-if="errorMsg" class="px-4 py-3 bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded-lg text-sm">{{ errorMsg }}</div>
 
     <div v-if="loading" class="text-center py-12 text-gray-500">加载中...</div>
 
