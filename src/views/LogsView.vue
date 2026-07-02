@@ -7,6 +7,7 @@ import LogTable from '@/components/logs/LogTable.vue'
 import LogDetail from '@/components/logs/LogDetail.vue'
 
 const target = ref('')
+const status = ref('')
 const page = ref(1)
 const limit = ref(20)
 const data = ref<LogListResponse | null>(null)
@@ -16,13 +17,18 @@ const selectedLog = ref<LogEntry | null>(null)
 async function load() {
   loading.value = true
   try {
-    data.value = await fetchLogs({ page: page.value, limit: limit.value, target: target.value || undefined })
+    data.value = await fetchLogs({
+      page: page.value,
+      limit: limit.value,
+      target: target.value || undefined,
+      status: status.value || undefined,
+    })
   } finally {
     loading.value = false
   }
 }
 
-watch([target, page], load, { immediate: true })
+watch([target, status, page], load, { immediate: true })
 
 function selectLog(log: LogEntry) {
   selectedLog.value = log
@@ -33,10 +39,12 @@ function selectLog(log: LogEntry) {
   <div class="space-y-4">
     <LogFilter
       :target="target"
+      :status="status"
       :page="page"
       :total="data?.total ?? 0"
       :limit="limit"
       @update:target="target = $event"
+      @update:status="status = $event"
       @update:page="page = $event"
     />
 

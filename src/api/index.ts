@@ -104,11 +104,12 @@ export function fetchHealth(): Promise<HealthResponse> {
   return getRequest<HealthResponse>('/api/health')
 }
 
-export function fetchLogs(params: { page?: number; limit?: number; target?: string } = {}): Promise<LogListResponse> {
+export function fetchLogs(params: { page?: number; limit?: number; target?: string; status?: string } = {}): Promise<LogListResponse> {
   const query = new URLSearchParams()
   if (params.page) query.set('page', String(params.page))
   if (params.limit) query.set('limit', String(params.limit))
   if (params.target) query.set('target', params.target)
+  if (params.status) query.set('status', params.status)
   const qs = query.toString()
   return getRequest<LogListResponse>(`/api/logs${qs ? `?${qs}` : ''}`)
 }

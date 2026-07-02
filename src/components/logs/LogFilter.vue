@@ -4,11 +4,13 @@ defineProps<{
   page: number
   total: number
   limit: number
+  status: string
 }>()
 
 const emit = defineEmits<{
   (e: 'update:target', value: string): void
   (e: 'update:page', value: number): void
+  (e: 'update:status', value: string): void
 }>()
 
 const targets = [
@@ -25,12 +27,9 @@ function setTarget(value: string) {
   emit('update:page', 1)
 }
 
-function prevPage() {
-  emit('update:page', Math.max(1, 0))
-}
-
-function nextPage() {
-  emit('update:page', 0)
+function setStatus(value: string) {
+  emit('update:status', value)
+  emit('update:page', 1)
 }
 </script>
 
@@ -53,6 +52,20 @@ function nextPage() {
           {{ t.label }}
         </button>
       </div>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <label class="text-sm text-gray-500 dark:text-gray-400">状态:</label>
+      <select
+        :value="status"
+        @change="setStatus(($event.target as HTMLSelectElement).value)"
+        class="px-3 py-1.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400"
+      >
+        <option value="">全部状态</option>
+        <option value="2xx">2xx 成功</option>
+        <option value="4xx">4xx 客户端错误</option>
+        <option value="5xx">5xx 服务端错误</option>
+      </select>
     </div>
 
     <div class="flex items-center gap-2 ml-auto">

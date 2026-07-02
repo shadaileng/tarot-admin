@@ -77,6 +77,7 @@
 | `page` | number | 1 | 页码 |
 | `limit` | number | 50 | 每页条数（最大 200） |
 | `target` | string | 全部 | 过滤: `reading` 或 `poster` |
+| `status` | string | 全部 | 过滤: `2xx` / `4xx` / `5xx` |
 
 ```typescript
 // 响应类型: LogListResponse
