@@ -13,8 +13,11 @@ const emit = defineEmits<{
 
 const targets = [
   { value: '', label: '全部' },
-  { value: 'reading', label: 'Reading' },
-  { value: 'poster', label: 'Poster' },
+  { value: 'reading', label: '解读' },
+  { value: 'poster', label: '海报' },
+  { value: 'auth', label: '认证' },
+  { value: 'user', label: '用户' },
+  { value: 'admin', label: '管理' },
 ]
 
 function setTarget(value: string) {

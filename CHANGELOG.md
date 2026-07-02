@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.9.1] - 2026-07-02
+
+### Changed
+
+- 请求日志筛选选项从 `reading`/`poster` 细化为模块分组：解读、海报、认证、用户、管理
+
 ## [2.8.0] - 2026-07-01
 
 ### Added
