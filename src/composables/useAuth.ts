@@ -12,9 +12,32 @@ const ACCESS_TOKEN_KEY = 'admin_access_token'
 const REFRESH_TOKEN_KEY = 'admin_refresh_token'
 const ADMIN_KEY = 'admin_info'
 
-const accessToken = ref<string | null>(localStorage.getItem(ACCESS_TOKEN_KEY))
-const refreshToken = ref<string | null>(localStorage.getItem(REFRESH_TOKEN_KEY))
-const admin = ref<AdminInfo | null>(loadAdminInfo())
+function isTokenExpired(token: string): boolean {
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]))
+    return payload.exp * 1000 < Date.now()
+  } catch {
+    return true
+  }
+}
+
+function loadStoredTokens(): { access: string | null; refresh: string | null } {
+  let access = localStorage.getItem(ACCESS_TOKEN_KEY)
+  let refresh = localStorage.getItem(REFRESH_TOKEN_KEY)
+  if (access && isTokenExpired(access)) {
+    localStorage.removeItem(ACCESS_TOKEN_KEY)
+    localStorage.removeItem(REFRESH_TOKEN_KEY)
+    localStorage.removeItem(ADMIN_KEY)
+    access = null
+    refresh = null
+  }
+  return { access, refresh }
+}
+
+const stored = loadStoredTokens()
+const accessToken = ref<string | null>(stored.access)
+const refreshToken = ref<string | null>(stored.refresh)
+const admin = ref<AdminInfo | null>(stored.access ? loadAdminInfo() : null)
 
 function loadAdminInfo(): AdminInfo | null {
   try {

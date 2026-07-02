@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.9.2] - 2026-07-02
+
+### Fixed
+
+- 修复 token 过期后并发请求导致的 fall-through bug，避免无限刷新循环
+- 应用初始化时校验 JWT 过期时间，自动清除 localStorage 中的过期 token
+- `request()` 添加重定向锁，防止多个并发 401 请求重复触发页面跳转
+- 移除 `REFRESH_EXPIRED` 死代码分支，简化 401 兜底处理逻辑
+- 健康检查轮询在 token 失效时自动停止，避免持续触发无效请求
+
 ## [2.9.1] - 2026-07-02
 
 ### Changed

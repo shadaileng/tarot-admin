@@ -5,6 +5,7 @@ const BASE = import.meta.env.VITE_API_BASE_URL
 
 let isRefreshing = false
 let refreshPromise: Promise<string> | null = null
+let isRedirectingToLogin = false
 
 function getAuthHeaders(): Record<string, string> {
   return useAuth().getAuthHeaders()
@@ -27,9 +28,13 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
           h.set('Authorization', `Bearer ${newToken}`)
           const retryRes = await fetch(`${BASE}${path}`, { ...options, headers: h })
           if (retryRes.ok) return retryRes.json() as Promise<T>
+          throw new Error('请求失败')
         } catch {
-          useAuth().logout()
-          window.location.href = '/login'
+          if (!isRedirectingToLogin) {
+            isRedirectingToLogin = true
+            useAuth().logout()
+            window.location.href = '/login'
+          }
           throw new Error('登录已过期，请重新登录')
         }
       }
@@ -44,8 +49,11 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
         if (!retryRes.ok) throw new Error('请求失败')
         return retryRes.json() as Promise<T>
       } catch {
-        useAuth().logout()
-        window.location.href = '/login'
+        if (!isRedirectingToLogin) {
+          isRedirectingToLogin = true
+          useAuth().logout()
+          window.location.href = '/login'
+        }
         throw new Error('登录已过期，请重新登录')
       } finally {
         isRefreshing = false
@@ -53,15 +61,12 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
       }
     }
 
-    if (body.error === 'REFRESH_EXPIRED') {
+    // 其他 401（如 UNAUTHORIZED "无效的 token"、REFRESH_EXPIRED）也跳转登录
+    if (!isRedirectingToLogin) {
+      isRedirectingToLogin = true
       useAuth().logout()
       window.location.href = '/login'
     }
-
-    // 兜底：其他 401（如 UNAUTHORIZED "无效的 token"）也跳转登录
-    useAuth().logout()
-    window.location.href = '/login'
-
     throw new Error(body.message || `HTTP ${res.status}`)
   }
 

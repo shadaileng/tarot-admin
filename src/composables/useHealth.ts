@@ -1,12 +1,14 @@
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, watch, onMounted, onUnmounted } from 'vue'
 import type { HealthResponse } from '@/types'
 import { fetchHealth } from '@/api'
+import { useAuth } from './useAuth'
 
 export function useHealth(intervalMs = 10000) {
   const data = ref<HealthResponse | null>(null)
   const error = ref<string | null>(null)
   const loading = ref(true)
   let timer: ReturnType<typeof setInterval> | null = null
+  const { isLoggedIn } = useAuth()
 
   async function refresh() {
     try {
@@ -19,13 +21,28 @@ export function useHealth(intervalMs = 10000) {
     }
   }
 
+  function stopPolling() {
+    if (timer) {
+      clearInterval(timer)
+      timer = null
+    }
+  }
+
+  watch(isLoggedIn, (loggedIn) => {
+    if (!loggedIn) {
+      stopPolling()
+    }
+  })
+
   onMounted(() => {
-    refresh()
-    timer = setInterval(refresh, intervalMs)
+    if (isLoggedIn.value) {
+      refresh()
+      timer = setInterval(refresh, intervalMs)
+    }
   })
 
   onUnmounted(() => {
-    if (timer) clearInterval(timer)
+    stopPolling()
   })
 
   return { data, error, loading, refresh }
