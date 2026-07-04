@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.13.0] - 2026-07-04
+
+### Added
+
+- 操作日志新增分类筛选功能：8 大操作分类（管理员管理/用户管理/积分与任务/解读任务/反馈系统/系统配置/账号认证/维护），分类下拉框一级筛选联动操作二级筛选
+- 操作日志表格新增「分类」列，以彩色徽章显示每条记录所属分类
+- 补齐 15 个新增操作类型的标签、颜色及详情摘要（修改密码/解绑邮箱/回复反馈/合并账号/取消解读/提交反馈/上传图片等）
+
 ## [2.11.0] - 2026-07-02
 
 ### Added

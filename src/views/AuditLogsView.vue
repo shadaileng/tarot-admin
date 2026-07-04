@@ -10,6 +10,7 @@ const data = ref<AuditLogEntry[]>([])
 const total = ref(0)
 const page = ref(1)
 const limit = ref(20)
+const categoryFilter = ref('')
 const actionFilter = ref('')
 const actorTypeFilter = ref('')
 const startDate = ref('')
@@ -27,6 +28,7 @@ const ACTION_LABELS: Record<string, string> = {
   points_earn: '获得积分',
   level_up: '等级提升',
   user_login: '用户登录',
+  user_register: '用户注册',
   bind_email: '绑定邮箱',
   bind_phone: '绑定手机',
   invite_bind: '绑定邀请码',
@@ -34,16 +36,30 @@ const ACTION_LABELS: Record<string, string> = {
   admin_adjust_points: '调整用户积分',
   admin_reset_quota: '重置用户额度',
   admin_clear_invite: '清除邀请绑定',
+  admin_complete_invite: '完成邀请',
+  admin_delete_invite: '删除邀请',
   admin_delete_user: '软删除用户',
   admin_restore_user: '恢复用户',
+  admin_unbind_email: '解绑用户邮箱',
   admin_update_config: '更新配置',
+  admin_update_page_section: '更新页面区块',
   admin_update_level: '更新等级定义',
   admin_update_task: '更新任务定义',
   admin_create_admin: '创建管理员',
   admin_update_admin: '更新管理员',
   admin_delete_admin: '删除管理员',
   admin_reset_password: '重置管理员密码',
+  admin_change_password: '修改自身密码',
   admin_clean_audit_logs: '清理审计日志',
+  admin_reply_feedback: '回复反馈',
+  admin_update_feedback_status: '更新反馈状态',
+  admin_cancel_reading: '管理员取消解读',
+  user_merge_account: '合并账号',
+  user_update_profile: '更新个人资料',
+  user_delete_record: '删除记录',
+  user_cancel_reading: '用户取消解读',
+  user_create_feedback: '提交反馈',
+  user_upload_image: '上传图片',
   quota_daily_reset: '每日额度重置',
 }
 
@@ -54,11 +70,39 @@ const ACTION_COLORS: Record<string, string> = {
   points_earn: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400',
   level_up: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
   user_login: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400',
+  user_register: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
+  bind_email: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
+  bind_phone: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
+  invite_bind: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
+  admin_login: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400',
   admin_adjust_points: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400',
   admin_reset_quota: 'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400',
+  admin_clear_invite: 'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400',
+  admin_complete_invite: 'bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400',
+  admin_delete_invite: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
   admin_delete_user: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
   admin_restore_user: 'bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400',
-  admin_clean_audit_logs: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400',
+  admin_unbind_email: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+  admin_update_config: 'bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400',
+  admin_update_page_section: 'bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400',
+  admin_update_level: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+  admin_update_task: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+  admin_create_admin: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400',
+  admin_update_admin: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400',
+  admin_delete_admin: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+  admin_reset_password: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400',
+  admin_change_password: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400',
+  admin_clean_audit_logs: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400',
+  admin_reply_feedback: 'bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-400',
+  admin_update_feedback_status: 'bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-400',
+  admin_cancel_reading: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400',
+  user_merge_account: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
+  user_update_profile: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+  user_delete_record: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+  user_cancel_reading: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400',
+  user_create_feedback: 'bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-400',
+  user_upload_image: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
+  quota_daily_reset: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400',
 }
 
 const ACTOR_TYPE_LABELS: Record<string, string> = {
@@ -66,6 +110,61 @@ const ACTOR_TYPE_LABELS: Record<string, string> = {
   admin: '管理员',
   system: '系统',
 }
+
+// 分类定义
+const ACTION_CATEGORIES: Record<string, string[]> = {
+  'admin-management': ['admin_login', 'admin_create_admin', 'admin_update_admin', 'admin_delete_admin', 'admin_reset_password', 'admin_change_password'],
+  'user-management': ['admin_delete_user', 'admin_restore_user', 'admin_unbind_email', 'user_merge_account', 'admin_adjust_points', 'admin_reset_quota', 'user_update_profile', 'user_delete_record'],
+  'points-tasks': ['checkin', 'task_claim', 'points_earn', 'level_up', 'admin_update_level', 'admin_update_task'],
+  reading: ['quota_consume', 'quota_daily_reset', 'user_cancel_reading', 'admin_cancel_reading'],
+  feedback: ['user_create_feedback', 'user_upload_image', 'admin_reply_feedback', 'admin_update_feedback_status'],
+  'system-config': ['admin_update_config', 'admin_update_page_section', 'admin_clear_invite', 'admin_complete_invite', 'admin_delete_invite'],
+  auth: ['user_login', 'user_register', 'bind_email', 'bind_phone', 'invite_bind'],
+  maintenance: ['admin_clean_audit_logs'],
+}
+
+const CATEGORY_LABELS: Record<string, string> = {
+  'admin-management': '🛡️ 管理员管理',
+  'user-management': '👥 用户管理',
+  'points-tasks': '🎁 积分与任务',
+  reading: '🔮 解读任务',
+  feedback: '💬 反馈系统',
+  'system-config': '⚙️ 系统配置',
+  auth: '🔐 账号认证',
+  maintenance: '🧹 维护',
+}
+
+const CATEGORY_COLORS: Record<string, string> = {
+  'admin-management': 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400',
+  'user-management': 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
+  'points-tasks': 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+  reading: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
+  feedback: 'bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-400',
+  'system-config': 'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400',
+  auth: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
+  maintenance: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400',
+}
+
+// 查找 action 所属分类
+function getCategoryForAction(action: string): string {
+  for (const [cat, actions] of Object.entries(ACTION_CATEGORIES)) {
+    if (actions.includes(action)) return cat
+  }
+  return ''
+}
+
+// 根据分类动态过滤操作下拉选项
+const filteredActionOptions = computed(() => {
+  if (!categoryFilter.value) return ACTION_LABELS
+  const actions = ACTION_CATEGORIES[categoryFilter.value] || []
+  const result: Record<string, string> = {}
+  for (const action of actions) {
+    if (ACTION_LABELS[action]) {
+      result[action] = ACTION_LABELS[action]
+    }
+  }
+  return result
+})
 
 async function doLoad() {
   loading.value = true
@@ -95,13 +194,19 @@ function triggerSearch() {
   debounceTimer = setTimeout(() => { page.value = 1; doLoad() }, 300)
 }
 
-watch([actionFilter, actorTypeFilter, startDate, endDate], () => {
+watch([categoryFilter, actionFilter, actorTypeFilter, startDate, endDate], () => {
   if (page.value !== 1) {
     page.value = 1
   } else {
     doLoad()
   }
 })
+
+// 分类变更时联动重置操作筛选
+watch(categoryFilter, () => {
+  actionFilter.value = ''
+})
+
 watch(page, doLoad, { immediate: true })
 
 function formatDate(d: string | null) {
@@ -137,6 +242,44 @@ function getDetailSummary(row: AuditLogEntry): string {
         return `已用额度 ${ov?.daily_quota_used ?? '?'} → 0`
       case 'level_up':
         return `Lv.${ov?.level ?? '?'} → Lv.${nv?.level ?? '?'}`
+      case 'admin_change_password':
+        return '管理员修改自身密码'
+      case 'admin_unbind_email':
+        return '解绑用户邮箱'
+      case 'admin_reply_feedback':
+        return `回复反馈: ${nv?.reply_preview?.substring(0, 20) || '...'}`
+      case 'admin_update_feedback_status':
+        return `反馈状态: ${ov?.status ?? '?'} → ${nv?.status ?? '?'}`
+      case 'user_merge_account':
+        return `合并账号 ${ov?.source_id ?? '?'} → ${nv?.target_id ?? '?'}`
+      case 'admin_cancel_reading':
+        return '管理员取消解读任务'
+      case 'user_cancel_reading':
+        return '用户取消解读'
+      case 'user_create_feedback':
+        return `提交反馈: ${nv?.category ?? '?'}`
+      case 'user_upload_image':
+        return '上传反馈图片'
+      case 'admin_complete_invite':
+        return '完成邀请绑定'
+      case 'admin_delete_invite':
+        return '删除邀请绑定'
+      case 'admin_update_page_section':
+        return '更新页面区块配置'
+      case 'user_update_profile':
+        return '更新昵称/头像/资料'
+      case 'user_delete_record':
+        return '删除记录'
+      case 'user_register':
+        return '新用户注册'
+      case 'bind_email':
+        return `绑定邮箱: ${nv?.email ? '***' + nv.email.slice(-4) : '?'}`
+      case 'bind_phone':
+        return `绑定手机: ${nv?.phone ? '***' + nv.phone.slice(-4) : '?'}`
+      case 'invite_bind':
+        return `绑定邀请码: ${nv?.invite_code ?? '?'}`
+      case 'quota_daily_reset':
+        return '每日额度自动重置'
       default:
         return '-'
     }
@@ -168,10 +311,15 @@ async function doClean() {
       <h2 class="text-lg font-semibold text-gray-900 dark:text-white">操作日志</h2>
       <div class="flex items-center gap-3">
         <span class="text-sm text-gray-500 dark:text-gray-400">共 {{ total }} 条</span>
+        <select v-model="categoryFilter"
+          class="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white appearance-none cursor-pointer">
+          <option value="">全部分类</option>
+          <option v-for="(label, key) in CATEGORY_LABELS" :key="key" :value="key">{{ label }}</option>
+        </select>
         <select v-model="actionFilter"
           class="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white appearance-none cursor-pointer">
           <option value="">全部操作</option>
-          <option v-for="(label, key) in ACTION_LABELS" :key="key" :value="key">{{ label }}</option>
+          <option v-for="(label, key) in filteredActionOptions" :key="key" :value="key">{{ label }}</option>
         </select>
         <select v-model="actorTypeFilter"
           class="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white appearance-none cursor-pointer">
@@ -199,6 +347,7 @@ async function doClean() {
           <thead>
             <tr class="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
               <th class="text-left px-4 py-3 font-medium text-gray-600 dark:text-gray-400 w-44">时间</th>
+              <th class="text-left px-4 py-3 font-medium text-gray-600 dark:text-gray-400 w-28">分类</th>
               <th class="text-left px-4 py-3 font-medium text-gray-600 dark:text-gray-400 w-32">行为者</th>
               <th class="text-left px-4 py-3 font-medium text-gray-600 dark:text-gray-400 w-36">操作</th>
               <th class="text-left px-4 py-3 font-medium text-gray-600 dark:text-gray-400 w-36">目标</th>
@@ -211,6 +360,14 @@ async function doClean() {
               class="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50 cursor-pointer"
               @click="openDetail(row)">
               <td class="px-4 py-3 text-xs text-gray-500 dark:text-gray-400">{{ formatDate(row.created_at) }}</td>
+              <td class="px-4 py-3">
+                <span v-if="getCategoryForAction(row.action)"
+                  class="px-2 py-0.5 rounded text-xs font-medium whitespace-nowrap"
+                  :class="CATEGORY_COLORS[getCategoryForAction(row.action)]">
+                  {{ CATEGORY_LABELS[getCategoryForAction(row.action)] }}
+                </span>
+                <span v-else class="text-gray-400 text-xs">-</span>
+              </td>
               <td class="px-4 py-3">
                 <span class="px-2 py-0.5 rounded text-xs font-medium"
                   :class="row.actor_type === 'admin' ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400' : row.actor_type === 'system' ? 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400' : 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'">
@@ -232,7 +389,7 @@ async function doClean() {
               <td class="px-4 py-3 text-xs text-gray-500 dark:text-gray-400">{{ row.ip_address || '-' }}</td>
             </tr>
             <tr v-if="data.length === 0">
-              <td colspan="6" class="text-center py-8 text-gray-500">暂无数据</td>
+              <td colspan="7" class="text-center py-8 text-gray-500">暂无数据</td>
             </tr>
           </tbody>
         </table>
