@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.13.1] - 2026-07-04
+
+### Fixed
+
+- 修复审计日志分类筛选下拉只过滤前端选项、实际未传递到后端的问题
+- `fetchAuditLogs` 的 `action` 参数支持 `string | string[]`，数组以逗号拼接发送
+- `AuditLogsView` 新增 `resolveActions()`：选分类未选具体操作时自动展开为该分类下全部 action 列表
+
 ## [2.13.0] - 2026-07-04
 
 ### Added

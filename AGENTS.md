@@ -154,6 +154,8 @@ tarot-admin/
 | `resetAdminPassword(id)` | `POST /api/admin/admins/:id/reset-password` | 重置管理员密码 |
 | `fetchConfig()` | `GET /api/config` | 获取运行时配置 |
 | `updateConfigItem(key, value)` | `PUT /api/config/:key` | 更新配置项（仅 admin 角色） |
+| `fetchAuditLogs(params)` | `GET /api/admin/audit-logs` | 审计日志查询（分页/actorType/action[支持数组]/dateRange） |
+| `cleanAuditLogs(retentionDays)` | `POST /api/admin/audit-logs/clean` | 手动清理过期审计日志 |
 
 ### Vite Proxy（开发环境）
 
@@ -295,6 +297,26 @@ Admin 恢复用户：
 | 修改密码 | `POST /admin/auth/change-password`，成功后自动登出 |
 | 首次登录强制改密 | `mustChangePassword=true` 时路由守卫自动跳转 `/change-password` |
 | 角色权限 | `admin`（完全访问）vs `readonly`（仅查看，隐藏编辑按钮 + 后端 403 双重限制） |
+
+## 审计日志（操作日志）
+
+### 页面功能（`AuditLogsView.vue`）
+
+| 模块 | 说明 |
+|------|------|
+| 分类筛选 | 8 大操作分类下拉框，选分类未选操作时自动展开为该分类下全部 action 列表传递给后端 |
+| 操作筛选 | 二级联动下拉，按所选分类动态过滤可选操作项 |
+| 操作者筛选 | 支持按用户昵称/ID 或管理员名称搜索操作者 |
+| 日期范围 | 起止日期选择器，按操作时间范围筛选 |
+| 表格展示 | 操作时间、操作者类型、操作者、操作类型（彩色徽章）、分类、目标、详情摘要 |
+| 分页 | 每页 20 条，页码导航 |
+
+### 操作分类与筛选逻辑
+
+前端 `fetchAuditLogs` 的 `action` 参数支持 `string | string[]`：
+- 选了具体操作 → 传递单个 action 字符串
+- 选了分类未选操作 → `resolveActions()` 将分类展开为该分类下全部 action 数组，以逗号拼接发送
+- 后端使用 SQL `IN (...)` 精确匹配
 
 ## 已知限制
 
