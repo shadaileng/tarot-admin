@@ -166,13 +166,23 @@ const filteredActionOptions = computed(() => {
   return result
 })
 
+function resolveActions(): string | string[] | undefined {
+  // 如果选了具体操作，优先使用（下拉已按分类过滤）
+  if (actionFilter.value) return actionFilter.value
+  // 如果只选了分类，展开为分类下所有 action
+  if (categoryFilter.value) {
+    return ACTION_CATEGORIES[categoryFilter.value] || undefined
+  }
+  return undefined
+}
+
 async function doLoad() {
   loading.value = true
   try {
     const res = await fetchAuditLogs({
       page: page.value,
       limit: limit.value,
-      action: actionFilter.value || undefined,
+      action: resolveActions(),
       actorType: actorTypeFilter.value || undefined,
       startDate: startDate.value || undefined,
       endDate: endDate.value || undefined,

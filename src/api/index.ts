@@ -398,7 +398,7 @@ export function fetchAuditLogs(params: {
   page?: number
   limit?: number
   actorType?: string
-  action?: string
+  action?: string | string[]
   targetType?: string
   startDate?: string
   endDate?: string
@@ -407,7 +407,14 @@ export function fetchAuditLogs(params: {
   if (params.page) query.set('page', String(params.page))
   if (params.limit) query.set('limit', String(params.limit))
   if (params.actorType) query.set('actorType', params.actorType)
-  if (params.action) query.set('action', params.action)
+  if (params.action) {
+    if (Array.isArray(params.action)) {
+      // 发送为逗号分隔的字符串，后端支持此格式解析
+      query.set('action', params.action.join(','))
+    } else {
+      query.set('action', params.action)
+    }
+  }
   if (params.targetType) query.set('targetType', params.targetType)
   if (params.startDate) query.set('startDate', params.startDate)
   if (params.endDate) query.set('endDate', params.endDate)
