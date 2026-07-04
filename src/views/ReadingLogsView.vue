@@ -88,5 +88,15 @@ onMounted(loadLogs)
 
     <!-- 详情弹窗 -->
     <ReadingLogDetail :log="selectedLog" :show="showDetail" @close="closeDetail" />
+
+    <!-- 跳转链接 -->
+    <div class="text-center pt-4 border-t border-gray-200 dark:border-gray-800">
+      <router-link
+        to="/reading-tasks"
+        class="text-sm text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center gap-1"
+      >
+        查看异步任务 →
+      </router-link>
+    </div>
   </div>
 </template>

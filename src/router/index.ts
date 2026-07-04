@@ -118,6 +118,12 @@ const router = createRouter({
       component: () => import('@/views/PageSectionsView.vue'),
       meta: { title: '页面管理' },
     },
+    {
+      path: '/reading-tasks',
+      name: 'reading-tasks',
+      component: () => import('@/views/ReadingTasksView.vue'),
+      meta: { title: '解读任务' },
+    },
   ],
 })
 

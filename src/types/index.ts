@@ -449,3 +449,41 @@ export interface PageSectionEntry {
 export interface PageSectionsResponse {
   sections: PageSectionEntry[]
 }
+
+// ========== 解读任务管理 ==========
+
+export interface ReadingTaskEntry {
+  id: string
+  created_at: string
+  updated_at: string | null
+  user_id: string
+  user_nickname: string | null
+  user_email: string | null
+  user_avatar: string | null
+  spread_type: string
+  question: string | null
+  cards_json: string
+  reading: string | null
+  model: string | null
+  status: string
+  incomplete: number
+  warning: string | null
+  error_msg: string | null
+  duration_ms: number | null
+}
+
+export interface ReadingTaskStats {
+  total: number
+  pending: number
+  completed: number
+  failed: number
+  cancelled: number
+}
+
+export interface ReadingTaskListResponse {
+  total: number
+  page: number
+  limit: number
+  data: ReadingTaskEntry[]
+  stats: ReadingTaskStats
+}

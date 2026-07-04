@@ -1,4 +1,4 @@
-import type { ServiceInfo, HealthResponse, LogListResponse, LogEntry, ReadingLogListResponse, ReadingLogEntry, MetricsSnapshot, ConfigResponse, UserListResponse, AdminListResponse, AdminEntry, CreateAdminRequest, UpdateAdminRequest, ResetPasswordRequest, ApiResponse, LevelDefinitionEntry, TaskDefinitionEntry, CreateTaskDefinitionRequest, UpdateTaskDefinitionRequest, UserStatsEntry, TrendResponse, AdminInviteListResponse, CheckinStatsResponse, FeedbackListResponse, FeedbackDetail, AuditLogListResponse, PageSectionsResponse } from '@/types'
+import type { ServiceInfo, HealthResponse, LogListResponse, LogEntry, ReadingLogListResponse, ReadingLogEntry, MetricsSnapshot, ConfigResponse, UserListResponse, AdminListResponse, AdminEntry, CreateAdminRequest, UpdateAdminRequest, ResetPasswordRequest, ApiResponse, LevelDefinitionEntry, TaskDefinitionEntry, CreateTaskDefinitionRequest, UpdateTaskDefinitionRequest, UserStatsEntry, TrendResponse, AdminInviteListResponse, CheckinStatsResponse, FeedbackListResponse, FeedbackDetail, AuditLogListResponse, PageSectionsResponse, ReadingTaskListResponse, ReadingTaskEntry } from '@/types'
 import { useAuth } from '@/composables/useAuth'
 import router from '@/router'
 
@@ -457,4 +457,35 @@ export function fetchPageSections(): Promise<PageSectionsResponse> {
 
 export function updatePageSection(id: string, visible: boolean): Promise<void> {
   return putRequest<void>(`/api/admin/page-sections/${id}`, { visible: visible ? 1 : 0 })
+}
+
+// ========== 解读任务管理 API ==========
+
+export function fetchReadingTasks(params: {
+  page?: number
+  limit?: number
+  status?: string
+  userId?: string
+  keyword?: string
+  dateFrom?: string
+  dateTo?: string
+} = {}): Promise<ReadingTaskListResponse> {
+  const query = new URLSearchParams()
+  if (params.page) query.set('page', String(params.page))
+  if (params.limit) query.set('limit', String(params.limit))
+  if (params.status) query.set('status', params.status)
+  if (params.userId) query.set('userId', params.userId)
+  if (params.keyword) query.set('keyword', params.keyword)
+  if (params.dateFrom) query.set('dateFrom', params.dateFrom)
+  if (params.dateTo) query.set('dateTo', params.dateTo)
+  const qs = query.toString()
+  return getRequest<ReadingTaskListResponse>(`/api/admin/reading-tasks${qs ? `?${qs}` : ''}`)
+}
+
+export function fetchReadingTaskById(id: string): Promise<ReadingTaskEntry> {
+  return getRequest<ReadingTaskEntry>(`/api/admin/reading-tasks/${id}`)
+}
+
+export function adminCancelReadingTask(taskId: string): Promise<{ taskId: string; status: string; quotaRefunded: boolean; message?: string }> {
+  return postRequest(`/api/admin/reading-tasks/${taskId}/cancel`, {})
 }
