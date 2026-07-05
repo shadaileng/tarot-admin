@@ -391,6 +391,32 @@ export interface AuditLogListResponse {
   data: AuditLogEntry[]
 }
 
+// ========== 客户端事件日志 ==========
+
+export interface ClientEventEntry {
+  id: string
+  user_id: string | null
+  created_at: string
+  event: string
+  category: string
+  level: string
+  result: string | null
+  action: string | null
+  data_json: string | null
+  platform: string | null
+  device_model: string | null
+  system_version: string | null
+  sdk_version: string | null
+  app_version: string | null
+}
+
+export interface ClientEventListResponse {
+  total: number
+  page: number
+  limit: number
+  data: ClientEventEntry[]
+}
+
 // ========== 菜单系统 ==========
 
 export interface MenuItem {

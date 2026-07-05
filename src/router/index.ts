@@ -113,6 +113,12 @@ const router = createRouter({
       meta: { title: '操作日志' },
     },
     {
+      path: '/client-events',
+      name: 'client-events',
+      component: () => import('@/views/ClientEventsView.vue'),
+      meta: { title: '客户端事件' },
+    },
+    {
       path: '/page-sections',
       name: 'page-sections',
       component: () => import('@/views/PageSectionsView.vue'),

@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.15.0] - 2026-07-05
+
+### Added
+
+- 新增客户端事件查看页面（`/client-events`）
+  - 7 大事件分类筛选（认证/解读/同步/海报/页面/用户行为/异常）
+  - 3 级过滤（info/warn/error）
+  - 用户 ID 搜索
+  - 事件类型下拉筛选
+  - 时间范围选择
+  - 详情弹窗（含设备信息、data_json 详情）
+  - 分页（默认 50 条/页）
+- 新增 `ClientEventEntry` 类型定义
+- 新增 `fetchClientEvents` API 函数
+
 ## [2.13.1] - 2026-07-04
 
 ### Fixed

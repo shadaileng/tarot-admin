@@ -426,6 +426,31 @@ export function cleanAuditLogs(retentionDays?: number): Promise<{ message: strin
   return postRequest<{ message: string; deleted: number; retentionDays: number }>('/api/admin/audit-logs/clean', { retentionDays })
 }
 
+// ========== 客户端事件 API ==========
+
+export function fetchClientEvents(params: {
+  page?: number
+  limit?: number
+  userId?: string
+  category?: string
+  level?: string
+  event?: string
+  from?: string
+  to?: string
+} = {}): Promise<import('@/types').ClientEventListResponse> {
+  const query = new URLSearchParams()
+  if (params.page) query.set('page', String(params.page))
+  if (params.limit) query.set('limit', String(params.limit))
+  if (params.userId) query.set('userId', params.userId)
+  if (params.category) query.set('category', params.category)
+  if (params.level) query.set('level', params.level)
+  if (params.event) query.set('event', params.event)
+  if (params.from) query.set('from', params.from)
+  if (params.to) query.set('to', params.to)
+  const qs = query.toString()
+  return getRequest<import('@/types').ClientEventListResponse>(`/api/admin/client-events${qs ? `?${qs}` : ''}`)
+}
+
 // ========== 菜单 API ==========
 
 export function fetchMyMenus(): Promise<{ menus: import('@/types').MenuTreeItem[] }> {
