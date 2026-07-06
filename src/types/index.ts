@@ -408,6 +408,7 @@ export interface ClientEventEntry {
   system_version: string | null
   sdk_version: string | null
   app_version: string | null
+  trace_id: string | null
 }
 
 export interface ClientEventListResponse {

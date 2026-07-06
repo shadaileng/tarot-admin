@@ -437,6 +437,7 @@ export function fetchClientEvents(params: {
   event?: string
   from?: string
   to?: string
+  traceId?: string
 } = {}): Promise<import('@/types').ClientEventListResponse> {
   const query = new URLSearchParams()
   if (params.page) query.set('page', String(params.page))
@@ -447,6 +448,7 @@ export function fetchClientEvents(params: {
   if (params.event) query.set('event', params.event)
   if (params.from) query.set('from', params.from)
   if (params.to) query.set('to', params.to)
+  if (params.traceId) query.set('traceId', params.traceId)
   const qs = query.toString()
   return getRequest<import('@/types').ClientEventListResponse>(`/api/admin/client-events${qs ? `?${qs}` : ''}`)
 }

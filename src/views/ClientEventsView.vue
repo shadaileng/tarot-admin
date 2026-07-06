@@ -11,6 +11,7 @@ const categoryFilter = ref('')
 const levelFilter = ref('')
 const userIdFilter = ref('')
 const eventFilter = ref('')
+const traceIdFilter = ref('')
 const startDate = ref('')
 const endDate = ref('')
 const loading = ref(true)
@@ -119,6 +120,7 @@ async function doLoad() {
     if (eventFilter.value) params.event = eventFilter.value
     if (startDate.value) params.from = new Date(startDate.value).toISOString()
     if (endDate.value) params.to = new Date(endDate.value + 'T23:59:59').toISOString()
+    if (traceIdFilter.value) params.traceId = traceIdFilter.value
 
     const res = await fetchClientEvents(params)
     data.value = res.data
@@ -128,7 +130,7 @@ async function doLoad() {
   }
 }
 
-watch([categoryFilter, levelFilter, userIdFilter, eventFilter, startDate, endDate], () => {
+watch([categoryFilter, levelFilter, userIdFilter, eventFilter, traceIdFilter, startDate, endDate], () => {
   if (page.value !== 1) {
     page.value = 1
   } else {
@@ -185,6 +187,8 @@ function truncateUserId(userId: string | null) {
         </select>
         <input v-model="userIdFilter" type="text" placeholder="用户ID" 
           class="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white w-32" />
+        <input v-model="traceIdFilter" type="text" placeholder="追踪ID" 
+          class="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white w-36" />
         <select v-model="eventFilter"
           class="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white appearance-none cursor-pointer">
           <option value="">全部事件</option>
@@ -205,6 +209,7 @@ function truncateUserId(userId: string | null) {
           <tr class="border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50">
             <th class="px-4 py-3 text-left font-medium text-gray-600 dark:text-gray-400">时间</th>
             <th class="px-4 py-3 text-left font-medium text-gray-600 dark:text-gray-400">用户</th>
+            <th class="px-4 py-3 text-left font-medium text-gray-600 dark:text-gray-400">追踪ID</th>
             <th class="px-4 py-3 text-left font-medium text-gray-600 dark:text-gray-400">分类</th>
             <th class="px-4 py-3 text-left font-medium text-gray-600 dark:text-gray-400">事件</th>
             <th class="px-4 py-3 text-left font-medium text-gray-600 dark:text-gray-400">级别</th>
@@ -215,7 +220,7 @@ function truncateUserId(userId: string | null) {
         </thead>
         <tbody>
           <tr v-if="data.length === 0">
-            <td colspan="8" class="px-4 py-8 text-center text-gray-400 dark:text-gray-500">暂无数据</td>
+            <td colspan="9" class="px-4 py-8 text-center text-gray-400 dark:text-gray-500">暂无数据</td>
           </tr>
           <tr v-for="row in data" :key="row.id"
             class="border-b border-gray-100 dark:border-gray-800/50 hover:bg-gray-50 dark:hover:bg-gray-800/30 cursor-pointer"
@@ -225,6 +230,12 @@ function truncateUserId(userId: string | null) {
               <span class="text-xs font-mono text-gray-500 dark:text-gray-400" :title="row.user_id || '匿名'">
                 {{ truncateUserId(row.user_id) }}
               </span>
+            </td>
+            <td class="px-4 py-3">
+              <span v-if="row.trace_id" class="text-xs font-mono text-gray-500 dark:text-gray-400 cursor-pointer hover:text-blue-500" :title="row.trace_id" @click.stop="traceIdFilter = row.trace_id">
+                {{ row.trace_id.slice(0, 8) }}…
+              </span>
+              <span v-else class="text-gray-400 dark:text-gray-600">-</span>
             </td>
             <td class="px-4 py-3">
               <span :class="['px-2 py-0.5 rounded-full text-xs font-medium', CATEGORY_COLORS[row.category] || 'bg-gray-100 text-gray-700']">
@@ -336,6 +347,13 @@ function truncateUserId(userId: string | null) {
                   <div>
                     <label class="block text-xs text-gray-500 dark:text-gray-400 mb-1">应用版本</label>
                     <p class="text-sm text-gray-900 dark:text-white">{{ detailRow.app_version || '-' }}</p>
+                  </div>
+                  <div>
+                    <label class="block text-xs text-gray-500 dark:text-gray-400 mb-1">追踪ID</label>
+                    <p v-if="detailRow.trace_id" class="text-sm text-gray-900 dark:text-white font-mono break-all cursor-pointer hover:text-blue-500" @click="traceIdFilter = detailRow.trace_id!; showDetail = false" :title="detailRow.trace_id">
+                      {{ detailRow.trace_id }}
+                    </p>
+                    <p v-else class="text-sm text-gray-900 dark:text-white">-</p>
                   </div>
                 </div>
 
