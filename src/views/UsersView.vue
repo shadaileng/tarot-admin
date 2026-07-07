@@ -87,6 +87,16 @@ function getLoginTypeIcon(row: UserEntry): string {
   return '❓'
 }
 
+function resolveAvatarUrl(url: string | null): string {
+  if (!url) return ''
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return url
+  }
+  // 相对路径，拼接 BASE
+  const base = import.meta.env.VITE_API_BASE_URL || ''
+  return `${base}${url}`
+}
+
 function selectUser(user: UserEntry) {
   selectedUser.value = user
 }
@@ -226,7 +236,7 @@ async function handleRestore(user: UserEntry) {
               <td class="px-4 py-3">
                 <div class="flex items-center gap-3">
                   <img
-                    :src="user.avatar_url || 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 40 40%22%3E%3Crect fill=%22%23e5e7eb%22 width=%2240%22 height=%2240%22/%3E%3Ctext x=%2250%25%22 y=%2255%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 fill=%22%239ca3af%22 font-size=%2216%22%3E?%3C/text%3E%3C/svg%3E'"
+                    :src="resolveAvatarUrl(user.avatar_url) || 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 40 40%22%3E%3Crect fill=%22%23e5e7eb%22 width=%2240%22 height=%2240%22/%3E%3Ctext x=%2250%25%22 y=%2255%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 fill=%22%239ca3af%22 font-size=%2216%22%3E?%3C/text%3E%3C/svg%3E'"
                     class="w-8 h-8 rounded-full object-cover bg-gray-200 dark:bg-gray-700 shrink-0"
                     alt=""
                   />
@@ -381,7 +391,7 @@ async function handleRestore(user: UserEntry) {
           <div class="px-5 py-5">
             <div class="flex flex-col items-center mb-6">
               <img
-                :src="selectedUser.avatar_url || 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 80 80%22%3E%3Crect fill=%22%23e5e7eb%22 width=%2280%22 height=%2280%22/%3E%3Ctext x=%2250%25%22 y=%2255%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 fill=%22%239ca3af%22 font-size=%2232%22%3E?%3C/text%3E%3C/svg%3E'"
+                :src="resolveAvatarUrl(selectedUser.avatar_url) || 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 80 80%22%3E%3Crect fill=%22%23e5e7eb%22 width=%2280%22 height=%2280%22/%3E%3Ctext x=%2250%25%22 y=%2255%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 fill=%22%239ca3af%22 font-size=%2232%22%3E?%3C/text%3E%3C/svg%3E'"
                 class="w-20 h-20 rounded-full object-cover bg-gray-200 dark:bg-gray-700 mb-3"
                 alt=""
               />
