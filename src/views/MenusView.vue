@@ -107,6 +107,7 @@ async function handleCreate() {
   try {
     await createMenu({
       ...createForm.value,
+      routeName: createForm.value.routeName || undefined,
       icon: createForm.value.icon || undefined,
       requireRole: createForm.value.requireRole || undefined,
     })
@@ -157,6 +158,7 @@ async function handleEdit() {
   try {
     await updateMenu(editTarget.value.id, {
       ...editForm.value,
+      routeName: editForm.value.routeName || undefined,
       icon: editForm.value.icon || undefined,
       requireRole: editForm.value.requireRole || undefined,
     })
@@ -471,7 +473,7 @@ async function handleDelete() {
               取消
             </button>
             <button
-              :disabled="createSubmitting || !createForm.label || !createForm.routeName"
+              :disabled="createSubmitting || !createForm.label"
               class="px-4 py-2 text-sm font-medium rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               @click="handleCreate"
             >
@@ -599,7 +601,7 @@ async function handleDelete() {
               取消
             </button>
             <button
-              :disabled="editSubmitting || !editForm.label || !editForm.routeName"
+              :disabled="editSubmitting || !editForm.label"
               class="px-4 py-2 text-sm font-medium rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               @click="handleEdit"
             >

@@ -444,7 +444,7 @@ export interface MenuTreeItem {
 
 export interface CreateMenuRequest {
   parentId?: string | null
-  routeName: string
+  routeName?: string | null
   label: string
   icon?: string | null
   sortOrder?: number
