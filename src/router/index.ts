@@ -65,6 +65,12 @@ const router = createRouter({
       meta: { title: '管理员管理', requireRole: 'admin' },
     },
     {
+      path: '/menus',
+      name: 'menus',
+      component: () => import('@/views/MenusView.vue'),
+      meta: { title: '菜单管理', requireRole: 'admin' },
+    },
+    {
       path: '/levels',
       name: 'levels',
       component: () => import('@/views/LevelsView.vue'),
