@@ -6,6 +6,36 @@ import { useToast } from '@/composables/useToast'
 
 const { showToast } = useToast()
 
+// 可用路由列表（route name → path）
+const routeOptions = [
+  { name: 'dashboard', path: '/', label: '仪表盘' },
+  { name: 'logs', path: '/logs', label: '请求日志' },
+  { name: 'reading-logs', path: '/reading-logs', label: '解读日志' },
+  { name: 'health', path: '/health', label: '健康监控' },
+  { name: 'metrics', path: '/metrics', label: '指标' },
+  { name: 'config', path: '/config', label: '配置' },
+  { name: 'audit-logs', path: '/audit-logs', label: '操作日志' },
+  { name: 'client-events', path: '/client-events', label: '客户端事件' },
+  { name: 'users', path: '/users', label: '用户管理' },
+  { name: 'user-stats', path: '/user-stats', label: '用户统计' },
+  { name: 'checkin-stats', path: '/checkin-stats', label: '签到统计' },
+  { name: 'invite-records', path: '/invite-records', label: '邀请记录' },
+  { name: 'admins', path: '/admins', label: '管理员管理' },
+  { name: 'menus', path: '/menus', label: '菜单管理' },
+  { name: 'levels', path: '/levels', label: '等级管理' },
+  { name: 'task-definitions', path: '/task-definitions', label: '任务管理' },
+  { name: 'stats-trends', path: '/stats-trends', label: '趋势统计' },
+  { name: 'feedback', path: '/feedback', label: '意见反馈' },
+  { name: 'page-sections', path: '/page-sections', label: '页面管理' },
+  { name: 'reading-tasks', path: '/reading-tasks', label: '解读任务' },
+]
+
+function getRouteLabel(routeName: string | null): string {
+  if (!routeName) return '-'
+  const route = routeOptions.find(r => r.name === routeName)
+  return route ? `${route.label} (${route.path})` : routeName
+}
+
 const menus = ref<MenuItem[]>([])
 const loading = ref(true)
 
@@ -293,7 +323,7 @@ async function handleDelete() {
                     <span class="text-gray-700 dark:text-gray-300">{{ item.label }}</span>
                   </div>
                 </td>
-                <td class="px-4 py-3 text-gray-500 dark:text-gray-400 text-xs font-mono">{{ item.routeName }}</td>
+                <td class="px-4 py-3 text-gray-500 dark:text-gray-400 text-xs font-mono">{{ getRouteLabel(item.routeName) }}</td>
                 <td class="px-4 py-3 text-right text-gray-500 dark:text-gray-400 text-xs">{{ item.sortOrder }}</td>
                 <td class="px-4 py-3 text-center">
                   <span
@@ -382,12 +412,15 @@ async function handleDelete() {
 
             <div>
               <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">路由名称 <span class="text-red-500">*</span></label>
-              <input
+              <select
                 v-model="createForm.routeName"
-                type="text"
-                placeholder="例如：dashboard"
-                class="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow"
-              />
+                class="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow"
+              >
+                <option value="">请选择路由</option>
+                <option v-for="r in routeOptions" :key="r.name" :value="r.name">
+                  {{ r.label }} ({{ r.path }})
+                </option>
+              </select>
             </div>
 
             <div>
@@ -508,11 +541,15 @@ async function handleDelete() {
 
             <div>
               <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">路由名称</label>
-              <input
+              <select
                 v-model="editForm.routeName"
-                type="text"
-                class="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow"
-              />
+                class="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow"
+              >
+                <option value="">无路由</option>
+                <option v-for="r in routeOptions" :key="r.name" :value="r.name">
+                  {{ r.label }} ({{ r.path }})
+                </option>
+              </select>
             </div>
 
             <div>
