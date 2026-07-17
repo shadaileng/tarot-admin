@@ -3,36 +3,28 @@ import { ref, onMounted, computed } from 'vue'
 import type { MenuItem } from '@/types'
 import { fetchAllMenus, createMenu, updateMenu, deleteMenu } from '@/api'
 import { useToast } from '@/composables/useToast'
+import router from '@/router'
 
 const { showToast } = useToast()
 
-// 可用路由列表（route name → path）
-const routeOptions = [
-  { name: 'dashboard', path: '/', label: '仪表盘' },
-  { name: 'logs', path: '/logs', label: '请求日志' },
-  { name: 'reading-logs', path: '/reading-logs', label: '解读日志' },
-  { name: 'health', path: '/health', label: '健康监控' },
-  { name: 'metrics', path: '/metrics', label: '指标' },
-  { name: 'config', path: '/config', label: '配置' },
-  { name: 'audit-logs', path: '/audit-logs', label: '操作日志' },
-  { name: 'client-events', path: '/client-events', label: '客户端事件' },
-  { name: 'users', path: '/users', label: '用户管理' },
-  { name: 'user-stats', path: '/user-stats', label: '用户统计' },
-  { name: 'checkin-stats', path: '/checkin-stats', label: '签到统计' },
-  { name: 'invite-records', path: '/invite-records', label: '邀请记录' },
-  { name: 'admins', path: '/admins', label: '管理员管理' },
-  { name: 'menus', path: '/menus', label: '菜单管理' },
-  { name: 'levels', path: '/levels', label: '等级管理' },
-  { name: 'task-definitions', path: '/task-definitions', label: '任务管理' },
-  { name: 'stats-trends', path: '/stats-trends', label: '趋势统计' },
-  { name: 'feedback', path: '/feedback', label: '意见反馈' },
-  { name: 'page-sections', path: '/page-sections', label: '页面管理' },
-  { name: 'reading-tasks', path: '/reading-tasks', label: '解读任务' },
-]
+// 需要排除的路由（登录/修改密码等非业务页面）
+const excludedRoutes = ['login', 'change-password']
+
+// 从路由配置动态生成可用路由列表
+const routeOptions = computed(() => {
+  return router.getRoutes()
+    .filter(r => r.name && !excludedRoutes.includes(r.name as string))
+    .map(r => ({
+      name: r.name as string,
+      path: r.path,
+      label: (r.meta as any).title || r.name as string,
+    }))
+    .sort((a, b) => a.label.localeCompare(b.label, 'zh-CN'))
+})
 
 function getRouteLabel(routeName: string | null): string {
   if (!routeName) return '-'
-  const route = routeOptions.find(r => r.name === routeName)
+  const route = routeOptions.value.find(r => r.name === routeName)
   return route ? `${route.label} (${route.path})` : routeName
 }
 
