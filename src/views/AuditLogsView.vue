@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue'
+import { ref, watch, computed, nextTick } from 'vue'
 import type { AuditLogEntry } from '@/types'
 import { fetchAuditLogs, cleanAuditLogs } from '@/api'
 import { useToast } from '@/composables/useToast'
@@ -16,6 +16,7 @@ const actorTypeFilter = ref('')
 const startDate = ref('')
 const endDate = ref('')
 const loading = ref(true)
+const jumpPage = ref(1)
 
 const showDetail = ref(false)
 const detailRow = ref<AuditLogEntry | null>(null)
@@ -198,13 +199,27 @@ async function doLoad() {
 
 const totalPages = computed(() => Math.ceil(total.value / limit.value))
 
+function handleJump() {
+  if (jumpPage.value >= 1 && jumpPage.value <= totalPages.value) {
+    page.value = jumpPage.value
+  }
+}
+
 let debounceTimer: ReturnType<typeof setTimeout> | null = null
 function triggerSearch() {
   if (debounceTimer) clearTimeout(debounceTimer)
   debounceTimer = setTimeout(() => { page.value = 1; doLoad() }, 300)
 }
 
-watch([categoryFilter, actionFilter, actorTypeFilter, startDate, endDate], () => {
+watch([categoryFilter, actionFilter, actorTypeFilter, startDate, endDate], async () => {
+  // 重置actionFilter（分类变化时）
+  if (categoryFilter.value) {
+    actionFilter.value = ''
+  }
+  
+  // 等待DOM更新后再加载
+  await nextTick()
+  
   if (page.value !== 1) {
     page.value = 1
   } else {
@@ -219,6 +234,9 @@ watch(categoryFilter, () => {
 
 watch(page, doLoad, { immediate: true })
 
+// 同步页码输入框
+watch(page, (newPage) => { jumpPage.value = newPage })
+
 function formatDate(d: string | null) {
   if (!d) return '-'
   return new Date(d).toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' })
@@ -230,6 +248,25 @@ function formatJson(jsonStr: string | null): string {
     return JSON.stringify(JSON.parse(jsonStr), null, 2)
   } catch {
     return jsonStr
+  }
+}
+
+function highlightJson(jsonStr: string | null): string {
+  if (!jsonStr) return '-'
+  try {
+    const formatted = formatJson(jsonStr)
+    // 简单的语法高亮：字符串、数字、布尔值、null
+    return formatted
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"([^"]+)"(?=\s*:)/g, '<span class="text-purple-600 dark:text-purple-400">"$1"</span>')
+      .replace(/:\s*"([^"]*)"/g, ': <span class="text-green-600 dark:text-green-400">"$1"</span>')
+      .replace(/:\s*(\d+)/g, ': <span class="text-blue-600 dark:text-blue-400">$1</span>')
+      .replace(/:\s*(true|false)/g, ': <span class="text-yellow-600 dark:text-yellow-400">$1</span>')
+      .replace(/:\s*(null)/g, ': <span class="text-gray-500 dark:text-gray-400">$1</span>')
+  } catch {
+    return jsonStr || '-'
   }
 }
 
@@ -410,6 +447,11 @@ async function doClean() {
         <div class="flex gap-2">
           <button :disabled="page <= 1" @click="page--"
             class="px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-lg disabled:opacity-50 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800">上一页</button>
+          <input v-model.number="jumpPage" type="number" :min="1" :max="totalPages" 
+            class="w-16 px-2 py-1 text-sm text-center border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300"
+            @keyup.enter="handleJump" placeholder="页码" />
+          <button @click="handleJump" :disabled="jumpPage < 1 || jumpPage > totalPages"
+            class="px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-lg disabled:opacity-50 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800">跳转</button>
           <button :disabled="page >= totalPages" @click="page++"
             class="px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-lg disabled:opacity-50 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800">下一页</button>
         </div>
@@ -433,11 +475,11 @@ async function doClean() {
           <div v-if="detailRow.old_value || detailRow.new_value" class="grid grid-cols-2 gap-4">
             <div>
               <h4 class="text-sm font-medium text-red-600 dark:text-red-400 mb-2">变更前</h4>
-              <pre class="bg-red-50 dark:bg-red-900/20 p-3 rounded-lg text-xs overflow-auto max-h-48 text-gray-900 dark:text-gray-100">{{ formatJson(detailRow.old_value) }}</pre>
+              <pre class="bg-red-50 dark:bg-red-900/20 p-3 rounded-lg text-xs overflow-auto max-h-48" v-html="highlightJson(detailRow.old_value)"></pre>
             </div>
             <div>
               <h4 class="text-sm font-medium text-green-600 dark:text-green-400 mb-2">变更后</h4>
-              <pre class="bg-green-50 dark:bg-green-900/20 p-3 rounded-lg text-xs overflow-auto max-h-48 text-gray-900 dark:text-gray-100">{{ formatJson(detailRow.new_value) }}</pre>
+              <pre class="bg-green-50 dark:bg-green-900/20 p-3 rounded-lg text-xs overflow-auto max-h-48" v-html="highlightJson(detailRow.new_value)"></pre>
             </div>
           </div>
 
