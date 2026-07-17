@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { fetchMyMenus } from '@/api'
 import type { MenuTreeItem } from '@/types'
 import ThemeToggle from './ThemeToggle.vue'
 
 const route = useRoute()
+const router = useRouter()
 
 const menuTree = ref<MenuTreeItem[]>([])
 const loading = ref(true)
@@ -27,6 +28,11 @@ function autoExpandActiveGroup() {
       expandedGroups.value.add(group.id)
     }
   }
+}
+
+function hasRoute(routeName: string | null): boolean {
+  if (!routeName) return false
+  return router.hasRoute(routeName)
 }
 
 onMounted(async () => {
@@ -86,22 +92,33 @@ watch(() => route.name, autoExpandActiveGroup)
           </button>
 
           <div v-show="expandedGroups.has(group.id)" class="ml-4 mt-1 space-y-1">
-            <router-link
-              v-for="item in group.children"
-              :key="item.id"
-              :to="item.routeName ? { name: item.routeName } : '#'"
-              class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors"
-              :class="
-                route.name === item.routeName
-                  ? 'bg-indigo-600 text-white'
-                  : 'hover:bg-gray-800 hover:text-white'
-              "
-            >
-              <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                <path stroke-linecap="round" stroke-linejoin="round" :d="item.icon || undefined" />
-              </svg>
-              {{ item.label }}
-            </router-link>
+            <template v-for="item in group.children" :key="item.id">
+              <router-link
+                v-if="hasRoute(item.routeName)"
+                :to="{ name: item.routeName! }"
+                class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors"
+                :class="
+                  route.name === item.routeName
+                    ? 'bg-indigo-600 text-white'
+                    : 'hover:bg-gray-800 hover:text-white'
+                "
+              >
+                <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" :d="item.icon || undefined" />
+                </svg>
+                {{ item.label }}
+              </router-link>
+              <span
+                v-else
+                class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-500 dark:text-gray-500 cursor-not-allowed"
+                :title="`路由 '${item.routeName}' 未配置`"
+              >
+                <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" :d="item.icon || undefined" />
+                </svg>
+                {{ item.label }}
+              </span>
+            </template>
           </div>
         </div>
       </div>
