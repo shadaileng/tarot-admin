@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, watch, computed, nextTick } from 'vue'
 import type { AuditLogEntry } from '@/types'
-import { fetchAuditLogs, cleanAuditLogs } from '@/api'
+import { fetchAuditLogs, cleanAuditLogs, exportAuditLogs } from '@/api'
 import { useToast } from '@/composables/useToast'
 
 const { showToast } = useToast()
@@ -21,6 +21,7 @@ const jumpPage = ref(1)
 const showDetail = ref(false)
 const detailRow = ref<AuditLogEntry | null>(null)
 const showCleanConfirm = ref(false)
+const exporting = ref(false)
 
 const ACTION_LABELS: Record<string, string> = {
   checkin: '签到',
@@ -34,6 +35,9 @@ const ACTION_LABELS: Record<string, string> = {
   bind_phone: '绑定手机',
   invite_bind: '绑定邀请码',
   admin_login: '管理员登录',
+  admin_login_failed: '管理员登录失败',
+  admin_logout: '管理员登出',
+  admin_token_refresh: 'token刷新',
   admin_adjust_points: '调整用户积分',
   admin_reset_quota: '重置用户额度',
   admin_clear_invite: '清除邀请绑定',
@@ -46,6 +50,7 @@ const ACTION_LABELS: Record<string, string> = {
   admin_update_page_section: '更新页面区块',
   admin_update_level: '更新等级定义',
   admin_update_task: '更新任务定义',
+  admin_create_task: '创建任务定义',
   admin_create_admin: '创建管理员',
   admin_update_admin: '更新管理员',
   admin_delete_admin: '删除管理员',
@@ -61,7 +66,16 @@ const ACTION_LABELS: Record<string, string> = {
   user_cancel_reading: '用户取消解读',
   user_create_feedback: '提交反馈',
   user_upload_image: '上传图片',
+  user_upload_avatar: '上传头像',
+  user_login_failed: '用户登录失败',
   quota_daily_reset: '每日额度重置',
+  access_denied: '越权操作',
+  auth_failed: '鉴权失败',
+  admin_create_menu: '创建菜单',
+  admin_update_menu: '更新菜单',
+  admin_delete_menu: '删除菜单',
+  admin_update_menu_sort: '更新菜单排序',
+  admin_update_role_menus: '更新角色菜单',
 }
 
 const ACTION_COLORS: Record<string, string> = {
@@ -88,6 +102,7 @@ const ACTION_COLORS: Record<string, string> = {
   admin_update_page_section: 'bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400',
   admin_update_level: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
   admin_update_task: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+  admin_create_task: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
   admin_create_admin: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400',
   admin_update_admin: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400',
   admin_delete_admin: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
@@ -103,7 +118,19 @@ const ACTION_COLORS: Record<string, string> = {
   user_cancel_reading: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400',
   user_create_feedback: 'bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-400',
   user_upload_image: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
+  user_upload_avatar: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
+  user_login_failed: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
   quota_daily_reset: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400',
+  access_denied: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+  auth_failed: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+  admin_login_failed: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+  admin_logout: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400',
+  admin_token_refresh: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
+  admin_create_menu: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400',
+  admin_update_menu: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400',
+  admin_delete_menu: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+  admin_update_menu_sort: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
+  admin_update_role_menus: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
 }
 
 const ACTOR_TYPE_LABELS: Record<string, string> = {
@@ -114,13 +141,13 @@ const ACTOR_TYPE_LABELS: Record<string, string> = {
 
 // 分类定义
 const ACTION_CATEGORIES: Record<string, string[]> = {
-  'admin-management': ['admin_login', 'admin_create_admin', 'admin_update_admin', 'admin_delete_admin', 'admin_reset_password', 'admin_change_password'],
-  'user-management': ['admin_delete_user', 'admin_restore_user', 'admin_unbind_email', 'user_merge_account', 'admin_adjust_points', 'admin_reset_quota', 'user_update_profile', 'user_delete_record'],
-  'points-tasks': ['checkin', 'task_claim', 'points_earn', 'level_up', 'admin_update_level', 'admin_update_task'],
+  'admin-management': ['admin_login', 'admin_login_failed', 'admin_logout', 'admin_token_refresh', 'admin_create_admin', 'admin_update_admin', 'admin_delete_admin', 'admin_reset_password', 'admin_change_password', 'access_denied'],
+  'user-management': ['admin_delete_user', 'admin_restore_user', 'admin_unbind_email', 'user_merge_account', 'admin_adjust_points', 'admin_reset_quota', 'user_update_profile', 'user_delete_record', 'user_upload_avatar'],
+  'points-tasks': ['checkin', 'task_claim', 'points_earn', 'level_up', 'admin_update_level', 'admin_update_task', 'admin_create_task'],
   reading: ['quota_consume', 'quota_daily_reset', 'user_cancel_reading', 'admin_cancel_reading'],
   feedback: ['user_create_feedback', 'user_upload_image', 'admin_reply_feedback', 'admin_update_feedback_status'],
-  'system-config': ['admin_update_config', 'admin_update_page_section', 'admin_clear_invite', 'admin_complete_invite', 'admin_delete_invite'],
-  auth: ['user_login', 'user_register', 'bind_email', 'bind_phone', 'invite_bind'],
+  'system-config': ['admin_update_config', 'admin_update_page_section', 'admin_clear_invite', 'admin_complete_invite', 'admin_delete_invite', 'admin_create_menu', 'admin_update_menu', 'admin_delete_menu', 'admin_update_menu_sort', 'admin_update_role_menus'],
+  auth: ['user_login', 'user_login_failed', 'user_register', 'bind_email', 'bind_phone', 'invite_bind', 'auth_failed'],
   maintenance: ['admin_clean_audit_logs'],
 }
 
@@ -350,6 +377,33 @@ async function doClean() {
     showToast(err.message || '清理失败', 'error')
   }
 }
+
+async function handleExport() {
+  exporting.value = true
+  try {
+    const blob = await exportAuditLogs({
+      action: resolveActions(),
+      actorType: actorTypeFilter.value || undefined,
+      startDate: startDate.value || undefined,
+      endDate: endDate.value || undefined,
+    })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    const now = new Date()
+    const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
+    a.href = url
+    a.download = `audit_logs_${dateStr}.csv`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+    showToast('导出成功', 'success')
+  } catch (err: any) {
+    showToast(err.message || '导出失败', 'error')
+  } finally {
+    exporting.value = false
+  }
+}
 </script>
 
 <template>
@@ -379,6 +433,10 @@ async function doClean() {
           class="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white" />
         <input v-model="endDate" type="date" placeholder="结束日期"
           class="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white" />
+        <button @click="handleExport" :disabled="exporting"
+          class="px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-50 transition-colors">
+          {{ exporting ? '导出中...' : '📥 导出 CSV' }}
+        </button>
         <button @click="showCleanConfirm = true"
           class="px-3 py-1.5 text-sm font-medium text-red-600 dark:text-red-400 border border-red-300 dark:border-red-600 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors">
           清理日志

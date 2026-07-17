@@ -426,6 +426,35 @@ export function cleanAuditLogs(retentionDays?: number): Promise<{ message: strin
   return postRequest<{ message: string; deleted: number; retentionDays: number }>('/api/admin/audit-logs/clean', { retentionDays })
 }
 
+export async function exportAuditLogs(params: {
+  actorType?: string
+  action?: string | string[]
+  targetType?: string
+  startDate?: string
+  endDate?: string
+}): Promise<Blob> {
+  const query = new URLSearchParams()
+  if (params.actorType) query.set('actorType', params.actorType)
+  if (params.action) {
+    if (Array.isArray(params.action)) {
+      query.set('action', params.action.join(','))
+    } else {
+      query.set('action', params.action)
+    }
+  }
+  if (params.targetType) query.set('targetType', params.targetType)
+  if (params.startDate) query.set('startDate', params.startDate)
+  if (params.endDate) query.set('endDate', params.endDate)
+  const qs = query.toString()
+  const h = new Headers(getAuthHeaders())
+  const res = await fetch(`${BASE}/api/admin/audit-logs/export${qs ? `?${qs}` : ''}`, { headers: h })
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}))
+    throw new Error(body.message || `导出失败: ${res.status}`)
+  }
+  return res.blob()
+}
+
 // ========== 客户端事件 API ==========
 
 export function fetchClientEvents(params: {
