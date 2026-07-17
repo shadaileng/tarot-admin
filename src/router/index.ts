@@ -136,6 +136,12 @@ const router = createRouter({
       component: () => import('@/views/ReadingTasksView.vue'),
       meta: { title: '解读任务' },
     },
+    {
+      path: '/persistence',
+      name: 'persistence',
+      component: () => import('@/views/PersistenceView.vue'),
+      meta: { title: '持久化监控' },
+    },
   ],
 })
 

@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.17.0] - 2026-07-18
+
+### Added
+
+- 新增持久化监控页面（`/persistence`）
+  - 数据库大小概览（含进度条，>100MB 红色告警）
+  - 总页数和空闲页统计
+  - 总占用空间（含头像上传、反馈附件）
+  - 保留策略配置展示
+  - 日志表行数表格（含保留天数）
+  - 其他表行数表格
+  - 一键清理所有日志按钮
+  - 增长趋势历史数据（7/30/90 天切换）
+- 新增 `PersistenceStats`、`PersistenceHistoryResponse`、`TableStats`、`FileStats`、`SizeHistorySnapshot` 类型定义
+- 新增 `fetchPersistenceStats()`、`fetchPersistenceHistory()`、`runPersistenceClean()` API 函数
+
 ## [2.16.1] - 2026-07-07
 
 ### Fixed

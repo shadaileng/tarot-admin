@@ -514,3 +514,57 @@ export interface ReadingTaskListResponse {
   data: ReadingTaskEntry[]
   stats: ReadingTaskStats
 }
+
+// ========== 持久化监控 ==========
+
+export interface TableStats {
+  name: string
+  rows: number
+  retentionDays: number
+}
+
+export interface FileStats {
+  path: string
+  sizeBytes: number
+  sizeHuman: string
+  count: number
+}
+
+export interface PersistenceStats {
+  database: {
+    path: string
+    sizeBytes: number
+    sizeHuman: string
+    pageSize: number
+    totalPages: number
+    freePages: number
+  }
+  tables: TableStats[]
+  files: {
+    database: FileStats
+    uploads: {
+      avatar: FileStats
+      feedback: FileStats
+    }
+  }
+  totalSizeBytes: number
+  totalSizeHuman: string
+  retention: {
+    logRetentionDays: number
+    auditLogRetentionDays: number
+  }
+}
+
+export interface SizeHistorySnapshot {
+  snapshotAt: string
+  dbSizeBytes: number
+  totalPages: number
+  freePages: number
+  tableRows: Record<string, number>
+  files: Array<{ path: string; sizeBytes: number; count: number }>
+}
+
+export interface PersistenceHistoryResponse {
+  snapshots: SizeHistorySnapshot[]
+  days: number
+}

@@ -1,4 +1,4 @@
-import type { ServiceInfo, HealthResponse, LogListResponse, LogEntry, ReadingLogListResponse, ReadingLogEntry, MetricsSnapshot, ConfigResponse, UserListResponse, AdminListResponse, AdminEntry, CreateAdminRequest, UpdateAdminRequest, ResetPasswordRequest, ApiResponse, LevelDefinitionEntry, TaskDefinitionEntry, CreateTaskDefinitionRequest, UpdateTaskDefinitionRequest, UserStatsEntry, TrendResponse, AdminInviteListResponse, CheckinStatsResponse, FeedbackListResponse, FeedbackDetail, AuditLogListResponse, PageSectionsResponse, ReadingTaskListResponse, ReadingTaskEntry } from '@/types'
+import type { ServiceInfo, HealthResponse, LogListResponse, LogEntry, ReadingLogListResponse, ReadingLogEntry, MetricsSnapshot, ConfigResponse, UserListResponse, AdminListResponse, AdminEntry, CreateAdminRequest, UpdateAdminRequest, ResetPasswordRequest, ApiResponse, LevelDefinitionEntry, TaskDefinitionEntry, CreateTaskDefinitionRequest, UpdateTaskDefinitionRequest, UserStatsEntry, TrendResponse, AdminInviteListResponse, CheckinStatsResponse, FeedbackListResponse, FeedbackDetail, AuditLogListResponse, PageSectionsResponse, ReadingTaskListResponse, ReadingTaskEntry, PersistenceStats, PersistenceHistoryResponse } from '@/types'
 import { useAuth } from '@/composables/useAuth'
 import router from '@/router'
 
@@ -551,4 +551,18 @@ export function fetchReadingTaskById(id: string): Promise<ReadingTaskEntry> {
 
 export function adminCancelReadingTask(taskId: string): Promise<{ taskId: string; status: string; quotaRefunded: boolean; message?: string }> {
   return postRequest(`/api/admin/reading-tasks/${taskId}/cancel`, {})
+}
+
+// ========== 持久化监控 ==========
+
+export function fetchPersistenceStats(): Promise<PersistenceStats> {
+  return getRequest<PersistenceStats>('/api/admin/persistence/stats')
+}
+
+export function fetchPersistenceHistory(days: number = 7): Promise<PersistenceHistoryResponse> {
+  return getRequest<PersistenceHistoryResponse>(`/api/admin/persistence/history?days=${days}`)
+}
+
+export function runPersistenceClean(): Promise<{ message: string; results: Array<{ table: string; deleted: number }>; total: number }> {
+  return postRequest('/api/admin/persistence/clean', {})
 }
