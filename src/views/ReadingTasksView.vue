@@ -6,6 +6,7 @@ import ReadingTaskDetail from '@/components/reading-tasks/ReadingTaskDetail.vue'
 
 const tasks = ref<ReadingTaskEntry[]>([])
 const loading = ref(true)
+const error = ref<string | null>(null)
 const page = ref(1)
 const total = ref(0)
 const limit = 50
@@ -21,6 +22,7 @@ const showDetail = ref(false)
 
 async function loadTasks() {
   loading.value = true
+  error.value = null
   try {
     const res = await fetchReadingTasks({
       page: page.value,
@@ -33,8 +35,8 @@ async function loadTasks() {
     tasks.value = res.data
     total.value = res.total
     stats.value = res.stats
-  } catch (err) {
-    console.error('Failed to load reading tasks:', err)
+  } catch (err: any) {
+    error.value = err.message || '加载解读任务失败'
   } finally {
     loading.value = false
   }
@@ -195,26 +197,34 @@ onMounted(loadTasks)
 
     <!-- 表格 -->
     <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
-      <div class="overflow-x-auto">
-        <table class="w-full text-sm">
-          <thead>
-            <tr class="border-b border-gray-200 dark:border-gray-700">
-              <th class="text-left py-3 px-4 font-medium text-gray-500 dark:text-gray-400">Task ID</th>
-              <th class="text-left py-3 px-4 font-medium text-gray-500 dark:text-gray-400">用户</th>
-              <th class="text-left py-3 px-4 font-medium text-gray-500 dark:text-gray-400">问题</th>
-              <th class="text-left py-3 px-4 font-medium text-gray-500 dark:text-gray-400">状态</th>
-              <th class="text-left py-3 px-4 font-medium text-gray-500 dark:text-gray-400">模型</th>
-              <th class="text-left py-3 px-4 font-medium text-gray-500 dark:text-gray-400">耗时</th>
-              <th class="text-left py-3 px-4 font-medium text-gray-500 dark:text-gray-400">时间</th>
-              <th class="text-left py-3 px-4 font-medium text-gray-500 dark:text-gray-400">操作</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-if="loading">
-              <td colspan="8" class="py-8 text-center text-gray-400 dark:text-gray-500">加载中...</td>
-            </tr>
-            <tr v-else-if="tasks.length === 0">
-              <td colspan="8" class="py-8 text-center text-gray-400 dark:text-gray-500">暂无数据</td>
+      <div v-if="error" class="text-center py-12">
+        <svg class="w-12 h-12 mx-auto text-red-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+        </svg>
+        <p class="text-red-500 dark:text-red-400 mb-3">{{ error }}</p>
+        <button @click="loadTasks" class="text-sm text-indigo-600 dark:text-indigo-400 hover:underline">点击重试</button>
+      </div>
+      <template v-else>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="border-b border-gray-200 dark:border-gray-700">
+                <th class="text-left py-3 px-4 font-medium text-gray-500 dark:text-gray-400">Task ID</th>
+                <th class="text-left py-3 px-4 font-medium text-gray-500 dark:text-gray-400">用户</th>
+                <th class="text-left py-3 px-4 font-medium text-gray-500 dark:text-gray-400">问题</th>
+                <th class="text-left py-3 px-4 font-medium text-gray-500 dark:text-gray-400">状态</th>
+                <th class="text-left py-3 px-4 font-medium text-gray-500 dark:text-gray-400">模型</th>
+                <th class="text-left py-3 px-4 font-medium text-gray-500 dark:text-gray-400">耗时</th>
+                <th class="text-left py-3 px-4 font-medium text-gray-500 dark:text-gray-400">时间</th>
+                <th class="text-left py-3 px-4 font-medium text-gray-500 dark:text-gray-400">操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-if="loading">
+                <td colspan="8" class="py-8 text-center text-gray-400 dark:text-gray-500">加载中...</td>
+              </tr>
+              <tr v-else-if="tasks.length === 0">
+                <td colspan="8" class="py-8 text-center text-gray-400 dark:text-gray-500">暂无数据</td>
             </tr>
             <tr
               v-for="task in tasks"
@@ -250,6 +260,7 @@ onMounted(loadTasks)
           </tbody>
         </table>
       </div>
+      </template>
     </div>
 
     <!-- 分页 -->

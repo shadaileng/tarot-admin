@@ -6,6 +6,7 @@ import { fetchCheckinStats } from '@/api'
 const stats = ref<CheckinStatsResponse | null>(null)
 const records = ref<any[]>([])
 const loading = ref(true)
+const error = ref<string | null>(null)
 const page = ref(1)
 const limit = ref(20)
 const total = ref(0)
@@ -14,13 +15,17 @@ const totalPages = computed(() => Math.ceil(total.value / limit.value))
 
 async function doLoad() {
   loading.value = true
+  error.value = null
   try {
     const res = await fetchCheckinStats({ detail: true, page: page.value, limit: limit.value })
     stats.value = res
     records.value = res.data || []
     total.value = res.total || 0
-  } catch {}
-  loading.value = false
+  } catch (err: any) {
+    error.value = err.message || '加载签到统计失败'
+  } finally {
+    loading.value = false
+  }
 }
 
 function formatDate(d: string) {
@@ -36,7 +41,15 @@ watch(page, doLoad, { immediate: true })
 
     <div v-if="loading && !stats" class="text-center py-12 text-gray-500">加载中...</div>
 
-    <template v-if="stats">
+    <div v-else-if="error" class="text-center py-12">
+      <svg class="w-12 h-12 mx-auto text-red-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+      </svg>
+      <p class="text-red-500 dark:text-red-400 mb-3">{{ error }}</p>
+      <button @click="doLoad" class="text-sm text-indigo-600 dark:text-indigo-400 hover:underline">点击重试</button>
+    </div>
+
+    <template v-else-if="stats">
       <div class="grid grid-cols-3 gap-4">
         <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
           <div class="text-2xl font-bold text-emerald-600 dark:text-emerald-400">{{ stats.todayCheckins }}</div>

@@ -5,15 +5,20 @@ import { fetchTrends } from '@/api'
 
 const data = ref<TrendResponse | null>(null)
 const loading = ref(true)
+const error = ref<string | null>(null)
 const days = ref(30)
 const visibleLines = ref<Record<LineKey, boolean>>({ registration: true, checkin: true, reading: true, invite: true })
 
 async function loadTrends() {
   loading.value = true
+  error.value = null
   try {
     data.value = await fetchTrends(days.value)
-  } catch {}
-  loading.value = false
+  } catch (err: any) {
+    error.value = err.message || '加载趋势数据失败'
+  } finally {
+    loading.value = false
+  }
 }
 
 function toggleLine(key: LineKey) {
@@ -59,7 +64,15 @@ onMounted(loadTrends)
 
     <div v-if="loading" class="text-center py-12 text-gray-500">加载中...</div>
 
-    <template v-if="!loading && data">
+    <div v-else-if="error" class="text-center py-12">
+      <svg class="w-12 h-12 mx-auto text-red-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+      </svg>
+      <p class="text-red-500 dark:text-red-400 mb-3">{{ error }}</p>
+      <button @click="loadTrends" class="text-sm text-indigo-600 dark:text-indigo-400 hover:underline">点击重试</button>
+    </div>
+
+    <template v-else-if="data">
       <div class="grid grid-cols-4 gap-4">
         <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
           <div class="text-2xl font-bold text-gray-900 dark:text-white">{{ data.summary.totalUsers }}</div>

@@ -94,8 +94,13 @@ async function doEdit() {
   }
 }
 
-function toggleActive(task: TaskDefinitionEntry) {
-  updateTaskDefinition(task.id, { is_active: task.is_active ? 0 : 1 }).then(loadTasks)
+async function toggleActive(task: TaskDefinitionEntry) {
+  try {
+    await updateTaskDefinition(task.id, { is_active: task.is_active ? 0 : 1 })
+    await loadTasks()
+  } catch (err: any) {
+    showToast(err.message || '更新状态失败', 'error')
+  }
 }
 
 onMounted(loadTasks)

@@ -15,6 +15,7 @@ const traceIdFilter = ref('')
 const startDate = ref('')
 const endDate = ref('')
 const loading = ref(true)
+const error = ref<string | null>(null)
 
 const showDetail = ref(false)
 const detailRow = ref<ClientEventEntry | null>(null)
@@ -109,6 +110,7 @@ const EVENT_LABELS: Record<string, string> = {
 
 async function doLoad() {
   loading.value = true
+  error.value = null
   try {
     const params: Record<string, any> = {
       page: page.value,
@@ -125,6 +127,8 @@ async function doLoad() {
     const res = await fetchClientEvents(params)
     data.value = res.data
     total.value = res.total
+  } catch (err: any) {
+    error.value = err.message || '加载事件日志失败'
   } finally {
     loading.value = false
   }
@@ -204,6 +208,13 @@ function truncateUserId(userId: string | null) {
     <!-- 表格 -->
     <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
       <div v-if="loading" class="p-8 text-center text-gray-400 dark:text-gray-500">加载中...</div>
+      <div v-else-if="error" class="text-center py-12">
+        <svg class="w-12 h-12 mx-auto text-red-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+        </svg>
+        <p class="text-red-500 dark:text-red-400 mb-3">{{ error }}</p>
+        <button @click="doLoad" class="text-sm text-indigo-600 dark:text-indigo-400 hover:underline">点击重试</button>
+      </div>
       <table v-else class="w-full text-sm">
         <thead>
           <tr class="border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50">
