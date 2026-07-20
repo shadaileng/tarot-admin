@@ -20,6 +20,10 @@ function redirectToLogin() {
 }
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
+  if (isRedirectingToLogin && useAuth().isLoggedIn.value) {
+    isRedirectingToLogin = false
+  }
+
   const h = new Headers(getAuthHeaders())
   if (options?.headers) {
     new Headers(options.headers).forEach((v, k) => h.set(k, v))
@@ -30,34 +34,39 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
     const body = await res.json().catch(() => ({}))
 
     if (body.error === 'TOKEN_EXPIRED') {
+      let newToken: string
+
       if (isRefreshing && refreshPromise) {
         try {
-          const newToken = await refreshPromise
-          h.set('Authorization', `Bearer ${newToken}`)
-          const retryRes = await fetch(`${BASE}${path}`, { ...options, headers: h })
-          if (retryRes.ok) return retryRes.json() as Promise<T>
+          newToken = await refreshPromise
         } catch {
           redirectToLogin()
+          throw new Error('登录已过期，请重新登录')
         }
-        throw new Error('登录已过期，请重新登录')
+      } else {
+        isRefreshing = true
+        refreshPromise = useAuth().refreshAccessToken()
+        try {
+          newToken = await refreshPromise
+        } catch {
+          redirectToLogin()
+          throw new Error('登录已过期，请重新登录')
+        } finally {
+          isRefreshing = false
+          refreshPromise = null
+        }
       }
 
-      isRefreshing = true
-      refreshPromise = useAuth().refreshAccessToken()
+      h.set('Authorization', `Bearer ${newToken}`)
+      const retryRes = await fetch(`${BASE}${path}`, { ...options, headers: h })
+      if (retryRes.ok) return retryRes.json() as Promise<T>
 
-      try {
-        const newToken = await refreshPromise
-        h.set('Authorization', `Bearer ${newToken}`)
-        const retryRes = await fetch(`${BASE}${path}`, { ...options, headers: h })
-        if (!retryRes.ok) throw new Error('请求失败')
-        return retryRes.json() as Promise<T>
-      } catch {
+      const retryBody = await retryRes.json().catch(() => ({}))
+      if (retryRes.status === 401) {
         redirectToLogin()
         throw new Error('登录已过期，请重新登录')
-      } finally {
-        isRefreshing = false
-        refreshPromise = null
       }
+      throw new Error(retryBody.message || retryBody.error || `HTTP ${retryRes.status}`)
     }
 
     // 其他 401（如 UNAUTHORIZED "无效的 token"、REFRESH_EXPIRED）也跳转登录

@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.17.1] - 2026-07-20
+
+### Fixed
+
+- 修复 token 过期后并发请求中某次重试因非鉴权错误（如 500）误触发登录跳转的问题
+- 修复 `isRedirectingToLogin` 标志在重新登录后永不重置的问题
+- 重试再遇 401 时仍正确跳转登录页（auth 系统异常），非鉴权错误只抛错误不跳转
+
 ## [2.17.0] - 2026-07-18
 
 ### Added
