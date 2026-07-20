@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import type { ReadingTaskEntry } from '@/types'
 import { adminCancelReadingTask } from '@/api'
+import { resolveImageUrl } from '@/utils/url'
 
 const props = defineProps<{
   task: ReadingTaskEntry | null
@@ -128,7 +129,7 @@ function parseCards(cardsJson: string | null): { name: string; orientation: stri
               <label class="text-sm text-gray-500 dark:text-gray-400 block mb-2">用户</label>
               <div class="flex items-center gap-3 bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
                 <div v-if="task.user_avatar" class="w-8 h-8 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700 shrink-0">
-                  <img :src="task.user_avatar" alt="" class="w-full h-full object-cover" />
+                  <img :src="resolveImageUrl(task.user_avatar)" alt="" class="w-full h-full object-cover" />
                 </div>
                 <div>
                   <p class="text-sm text-gray-900 dark:text-gray-100 font-medium">{{ task.user_nickname ?? '匿名用户' }}</p>

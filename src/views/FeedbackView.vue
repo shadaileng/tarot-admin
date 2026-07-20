@@ -3,6 +3,7 @@ import { ref, watch, computed } from 'vue'
 import { fetchFeedbackList, fetchFeedbackDetail, replyFeedback, updateFeedbackStatus } from '@/api'
 import type { FeedbackItem, FeedbackDetail } from '@/types'
 import { useToast } from '@/composables/useToast'
+import { resolveImageUrl } from '@/utils/url'
 
 const { showToast } = useToast()
 
@@ -112,14 +113,8 @@ const statusOptions = [
   { value: 'closed', label: '已关闭' },
 ]
 
-// 获取图片完整 URL
-function getImageUrl(path: string): string {
-  const base = import.meta.env.VITE_API_BASE_URL || ''
-  return `${base}${path}`
-}
-
 function previewImage(url: string) {
-  window.open(getImageUrl(url), '_blank')
+  window.open(resolveImageUrl(url), '_blank')
 }
 </script>
 
@@ -167,7 +162,7 @@ function previewImage(url: string) {
                 <div class="flex items-center gap-2">
                   <img
                     v-if="item.userAvatar"
-                    :src="item.userAvatar"
+                    :src="resolveImageUrl(item.userAvatar)"
                     class="w-7 h-7 rounded-full object-cover"
                   />
                   <div v-else class="w-7 h-7 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center text-xs text-indigo-600 dark:text-indigo-300">
@@ -260,7 +255,7 @@ function previewImage(url: string) {
 
             <!-- 用户信息 -->
             <div v-if="detail.user" class="flex items-center gap-3 mb-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-              <img v-if="detail.user.avatarUrl" :src="detail.user.avatarUrl" class="w-10 h-10 rounded-full object-cover" />
+              <img v-if="detail.user.avatarUrl" :src="resolveImageUrl(detail.user.avatarUrl)" class="w-10 h-10 rounded-full object-cover" />
               <div v-else class="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center text-sm text-indigo-600 dark:text-indigo-300">
                 {{ detail.user.nickname?.charAt(0) || '?' }}
               </div>
@@ -308,7 +303,7 @@ function previewImage(url: string) {
                 <img
                   v-for="(img, idx) in detail.images"
                   :key="idx"
-                  :src="getImageUrl(img)"
+                  :src="resolveImageUrl(img)"
                   class="w-20 h-20 rounded-lg object-cover cursor-pointer border border-gray-200 dark:border-gray-700"
                   @click="previewImage(img)"
                 />
