@@ -1,4 +1,4 @@
-import type { ServiceInfo, HealthResponse, LogListResponse, LogEntry, ReadingLogListResponse, ReadingLogEntry, MetricsSnapshot, ConfigResponse, UserListResponse, AdminListResponse, AdminEntry, CreateAdminRequest, UpdateAdminRequest, ResetPasswordRequest, ApiResponse, LevelDefinitionEntry, TaskDefinitionEntry, CreateTaskDefinitionRequest, UpdateTaskDefinitionRequest, UserStatsEntry, TrendResponse, AdminInviteListResponse, CheckinStatsResponse, FeedbackListResponse, FeedbackDetail, AuditLogListResponse, PageSectionsResponse, ReadingTaskListResponse, ReadingTaskEntry, PersistenceStats, PersistenceHistoryResponse } from '@/types'
+import type { ServiceInfo, HealthResponse, LogListResponse, LogEntry, ReadingLogListResponse, ReadingLogEntry, MetricsSnapshot, ConfigResponse, UserListResponse, AdminListResponse, AdminEntry, CreateAdminRequest, UpdateAdminRequest, ResetPasswordRequest, ApiResponse, LevelDefinitionEntry, TaskDefinitionEntry, CreateTaskDefinitionRequest, UpdateTaskDefinitionRequest, UserStatsEntry, TrendResponse, AdminInviteListResponse, CheckinStatsResponse, FeedbackListResponse, FeedbackDetail, AuditLogListResponse, PageSectionsResponse, ReadingTaskListResponse, ReadingTaskEntry, PersistenceStats, PersistenceHistoryResponse, BackupListResponse, BackupCreateResponse, RestoreResponse } from '@/types'
 import { useAuth } from '@/composables/useAuth'
 import router from '@/router'
 
@@ -565,4 +565,40 @@ export function fetchPersistenceHistory(days: number = 7): Promise<PersistenceHi
 
 export function runPersistenceClean(): Promise<{ message: string; results: Array<{ table: string; deleted: number }>; total: number }> {
   return postRequest('/api/admin/persistence/clean', {})
+}
+
+// ========== 备份恢复 API ==========
+
+export function createBackup(): Promise<BackupCreateResponse> {
+  return postRequest<BackupCreateResponse>('/api/admin/backup', {})
+}
+
+export function listBackups(): Promise<BackupListResponse> {
+  return getRequest<BackupListResponse>('/api/admin/backup/list')
+}
+
+export function downloadBackupBlob(filename: string): Promise<Blob> {
+  const h = new Headers(getAuthHeaders())
+  return fetch(`${import.meta.env.VITE_API_BASE_URL}/api/admin/backup/download/${encodeURIComponent(filename)}`, {
+    method: 'GET',
+    headers: h,
+  }).then(res => {
+    if (!res.ok) throw new Error('下载失败')
+    return res.blob()
+  })
+}
+
+export function deleteBackup(filename: string): Promise<{ success: boolean; message?: string }> {
+  return deleteRequest<{ success: boolean; message?: string }>(`/api/admin/backup/${encodeURIComponent(filename)}`)
+}
+
+export function restoreBackup(file: File): Promise<RestoreResponse> {
+  const formData = new FormData()
+  formData.append('file', file)
+  const h = new Headers(getAuthHeaders())
+  return fetch(`${import.meta.env.VITE_API_BASE_URL}/api/admin/restore`, {
+    method: 'POST',
+    headers: h,
+    body: formData,
+  }).then(res => res.json())
 }

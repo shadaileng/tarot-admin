@@ -568,3 +568,45 @@ export interface PersistenceHistoryResponse {
   snapshots: SizeHistorySnapshot[]
   days: number
 }
+
+// ========== 备份恢复 ==========
+
+export interface BackupInfo {
+  name: string
+  filename: string
+  size: number
+  createdAt: string
+  manifest?: {
+    backup_name: string
+    timestamp: string
+    created_at: string
+    hostname: string
+    config: { db_path: string; uploads_dir: string }
+    files: { database: number; uploads: string }
+  }
+}
+
+export interface BackupListResponse {
+  backups: BackupInfo[]
+  total: number
+  totalSize: number
+}
+
+export interface BackupCreateResponse {
+  success: boolean
+  backup?: {
+    name: string
+    filename: string
+    size: number
+    createdAt: string
+    includes: { database: boolean; uploads: boolean }
+  }
+  error?: string
+}
+
+export interface RestoreResponse {
+  success: boolean
+  message: string
+  restored?: { database: boolean; uploads: boolean }
+  requireRestart?: boolean
+}

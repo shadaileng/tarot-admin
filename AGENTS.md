@@ -14,6 +14,7 @@
 - **配置查看**：环境变量列表（按类别分组，API Key 脱敏）
 - **用户管理**：用户列表查看、搜索、请求统计、详情弹窗
 - **管理员管理**（仅 admin 角色可见）：管理员列表、新增/编辑/删除
+- **备份恢复**：触发备份、下载/删除备份、上传备份包恢复数据
 - **主题切换**：暗色/亮色，localStorage 持久化
 - **认证系统**：JWT 登录、密码修改、首次登录强制改密、角色权限控制
 
@@ -98,6 +99,7 @@ tarot-admin/
         ├── ConfigView.vue        # 配置查看页面（环境变量分组展示，只读角色仅可查看不可编辑）
         ├── UsersView.vue         # 用户管理页面（列表/搜索/详情弹窗）
         ├── AdminsView.vue        # 管理员管理页面（仅 admin 角色可见）
+        ├── BackupView.vue        # 备份恢复页面（触发/下载/删除/恢复）
         ├── LoginView.vue         # 管理员登录页面
         └── ChangePasswordView.vue # 修改密码页面（首次登录强制跳转）
 ```
@@ -115,6 +117,7 @@ tarot-admin/
 | `/config` | `config` | 配置查看 | 需登录（只读角色仅可查看不可编辑） |
 | `/users` | `users` | 用户管理 | 需登录 |
 | `/admins` | `admins` | 管理员管理 | 仅 admin 角色 |
+| `/backup` | `backup` | 备份恢复 | 需登录 |
 
 ## 编码规范
 
@@ -156,6 +159,11 @@ tarot-admin/
 | `updateConfigItem(key, value)` | `PUT /api/config/:key` | 更新配置项（仅 admin 角色） |
 | `fetchAuditLogs(params)` | `GET /api/admin/audit-logs` | 审计日志查询（分页/actorType/action[支持数组]/dateRange） |
 | `cleanAuditLogs(retentionDays)` | `POST /api/admin/audit-logs/clean` | 手动清理过期审计日志 |
+| `createBackup()` | `POST /api/admin/backup` | 触发备份（仅非只读管理员） |
+| `listBackups()` | `GET /api/admin/backup/list` | 列出所有备份 |
+| `downloadBackupBlob(filename)` | `GET /api/admin/backup/download/:filename` | 下载备份包 |
+| `deleteBackup(filename)` | `DELETE /api/admin/backup/:filename` | 删除备份（仅非只读管理员） |
+| `restoreBackup(file)` | `POST /api/admin/restore` | 上传备份包恢复数据（仅非只读管理员） |
 
 ### Vite Proxy（开发环境）
 

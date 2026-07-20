@@ -142,6 +142,12 @@ const router = createRouter({
       component: () => import('@/views/PersistenceView.vue'),
       meta: { title: '持久化监控' },
     },
+    {
+      path: '/backup',
+      name: 'backup',
+      component: () => import('@/views/BackupView.vue'),
+      meta: { title: '备份恢复' },
+    },
   ],
 })
 
