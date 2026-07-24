@@ -51,8 +51,16 @@ function formatMs(ms: number | null): string {
                 <p class="text-gray-900 dark:text-gray-100">{{ new Date(log.created_at).toLocaleString() }}</p>
               </div>
               <div>
+                <span class="text-gray-500 dark:text-gray-400">方法</span>
+                <p class="text-gray-900 dark:text-gray-100">{{ log.method }}</p>
+              </div>
+              <div>
                 <span class="text-gray-500 dark:text-gray-400">路径</span>
-                <p class="text-gray-900 dark:text-gray-100">{{ log.method }} {{ log.path }}</p>
+                <p class="text-gray-900 dark:text-gray-100 font-mono text-xs">{{ log.path }}</p>
+              </div>
+              <div>
+                <span class="text-gray-500 dark:text-gray-400">查询参数</span>
+                <p class="text-gray-900 dark:text-gray-100 font-mono text-xs break-all">{{ log.query_string ?? '-' }}</p>
               </div>
               <div>
                 <span class="text-gray-500 dark:text-gray-400">状态码</span>
@@ -66,24 +74,16 @@ function formatMs(ms: number | null): string {
                 <p class="text-gray-900 dark:text-gray-100">{{ formatMs(log.duration_ms) }}</p>
               </div>
               <div>
-                <span class="text-gray-500 dark:text-gray-400">模板耗时</span>
-                <p class="text-gray-900 dark:text-gray-100">{{ formatMs(log.template_ms) }}</p>
-              </div>
-              <div>
-                <span class="text-gray-500 dark:text-gray-400">资源耗时</span>
-                <p class="text-gray-900 dark:text-gray-100">{{ formatMs(log.resource_ms) }}</p>
-              </div>
-              <div>
-                <span class="text-gray-500 dark:text-gray-400">截图耗时</span>
-                <p class="text-gray-900 dark:text-gray-100">{{ formatMs(log.screenshot_ms) }}</p>
-              </div>
-              <div>
-                <span class="text-gray-500 dark:text-gray-400">缓存</span>
-                <p class="text-gray-900 dark:text-gray-100">{{ log.cache_hit ? 'HIT' : 'MISS' }}</p>
+                <span class="text-gray-500 dark:text-gray-400">目标</span>
+                <p class="text-gray-900 dark:text-gray-100">{{ log.target ?? '-' }}</p>
               </div>
               <div>
                 <span class="text-gray-500 dark:text-gray-400">IP</span>
                 <p class="text-gray-900 dark:text-gray-100">{{ log.ip_address ?? '-' }}</p>
+              </div>
+              <div>
+                <span class="text-gray-500 dark:text-gray-400">User-Agent</span>
+                <p class="text-gray-900 dark:text-gray-100 text-xs break-all">{{ log.user_agent ?? '-' }}</p>
               </div>
               <div>
                 <span class="text-gray-500 dark:text-gray-400">用户</span>
@@ -107,6 +107,23 @@ function formatMs(ms: number | null): string {
                 <span class="text-gray-500 dark:text-gray-400">用户ID</span>
                 <p class="font-mono text-xs text-gray-900 dark:text-gray-100 break-all">
                   {{ log.user_id ?? '-' }}
+                </p>
+              </div>
+            </div>
+
+            <div class="border-t border-gray-200 dark:border-gray-700 pt-4 space-y-4">
+              <div>
+                <span class="text-gray-500 dark:text-gray-400">请求体</span>
+                <pre class="mt-1 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg text-xs text-gray-800 dark:text-gray-200 overflow-auto max-h-48">{{ log.request_body ?? '(无)' }}</pre>
+                <p v-if="log.request_body_size !== null" class="text-xs text-gray-400 mt-1">
+                  {{ log.request_body_size >= 2000 ? `原始大小: ${log.request_body_size} bytes（已截断）` : `大小: ${log.request_body_size} bytes` }}
+                </p>
+              </div>
+              <div>
+                <span class="text-gray-500 dark:text-gray-400">响应体</span>
+                <pre class="mt-1 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg text-xs text-gray-800 dark:text-gray-200 overflow-auto max-h-48">{{ log.response_body ?? '(无)' }}</pre>
+                <p v-if="log.response_body_size !== null" class="text-xs text-gray-400 mt-1">
+                  {{ log.response_body_size >= 2000 ? `原始大小: ${log.response_body_size} bytes（已截断）` : `大小: ${log.response_body_size} bytes` }}
                 </p>
               </div>
             </div>

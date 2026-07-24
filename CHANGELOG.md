@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.18.0] - 2026-07-24
+
+### Added
+
+- 日志详情新增请求体/响应体展示（含大小信息和截断提示）
+- 日志详情展示 User-Agent、查询参数、目标分类字段
+
+### Changed
+
+- 日志表格简化列结构：移除模板耗时/资源耗时/截图耗时/缓存状态列，新增 IP 列
+- 路径列改为"方法+路径"显示，方法带标签背景色
+- 日志详情移除 poster 专用字段（模板耗时/资源耗时/截图耗时/缓存），新增请求体/响应体区域
+- 指标页面移除缓存命中率/阶段耗时卡片和样本统计中的缓存统计
+- `LogEntry` 类型接口适配后端新字段
+
 ## [2.17.2] - 2026-07-20
 
 ### Fixed

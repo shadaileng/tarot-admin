@@ -35,14 +35,16 @@ export interface LogEntry {
   created_at: string
   method: string
   path: string
+  query_string: string | null
   target: string
   status_code: number
   duration_ms: number
-  template_ms: number | null
-  resource_ms: number | null
-  screenshot_ms: number | null
-  cache_hit: number
   ip_address: string | null
+  user_agent: string | null
+  request_body: string | null
+  response_body: string | null
+  request_body_size: number | null
+  response_body_size: number | null
   is_error: number
   error_msg: string | null
   user_id: string | null
@@ -83,28 +85,12 @@ export interface ReadingLogListResponse {
 
 export interface MetricsSnapshot {
   totalRequests: number
-  cacheHits: number
-  cacheMisses: number
-  cacheHitRate: number
   errorCount: number
   avgTotalMs: number
-  avgTemplateMs: number
-  avgResourceMs: number
-  avgScreenshotMs: number
   totalP50: number
   totalP95: number
   totalP99: number
-  templateP50: number
-  templateP95: number
-  templateP99: number
-  resourceP50: number
-  resourceP95: number
-  resourceP99: number
-  screenshotP50: number
-  screenshotP95: number
-  screenshotP99: number
   sampleCount: number
-  nonCacheSampleCount: number
 }
 
 export interface AdminInfo {

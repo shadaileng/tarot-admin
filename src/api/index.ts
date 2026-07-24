@@ -152,7 +152,6 @@ export function parsePrometheusMetrics(raw: string): Partial<MetricsSnapshot> {
   const lines = raw.split('\n')
   for (const line of lines) {
     if (line.startsWith('#') || line.trim() === '') continue
-    // 解析带 label 的指标：request_duration_ms{quantile="0.5"} 11
     const matchWithLabel = line.match(/^(\w+)\{[^}]*quantile="([^"]+)"\}\s+([\d.]+)/)
     if (matchWithLabel) {
       const metricName = matchWithLabel[1]
@@ -162,7 +161,6 @@ export function parsePrometheusMetrics(raw: string): Partial<MetricsSnapshot> {
       result[key] = value
       continue
     }
-    // 解析带 label 的按 target 分组指标：request_by_target_total{target="reading"} 1
     const matchWithTarget = line.match(/^(\w+)\{target="([^"]+)"\}\s+([\d.]+)/)
     if (matchWithTarget) {
       const metricName = matchWithTarget[1]
@@ -172,7 +170,6 @@ export function parsePrometheusMetrics(raw: string): Partial<MetricsSnapshot> {
       result[key] = value
       continue
     }
-    // 解析普通指标：request_requests_total 42
     const match = line.match(/^(\w+)\s+([\d.]+)/)
     if (match) {
       result[match[1]] = parseFloat(match[2])
@@ -180,30 +177,14 @@ export function parsePrometheusMetrics(raw: string): Partial<MetricsSnapshot> {
   }
   return {
     totalRequests: result['request_requests_total'] ?? 0,
-    cacheHits: result['request_cache_hits_total'] ?? 0,
-    cacheMisses: result['request_cache_misses_total'] ?? 0,
-    cacheHitRate: result['request_cache_hit_rate'] ?? 0,
     errorCount: result['request_errors_total'] ?? 0,
     avgTotalMs: result['request_duration_ms_count'] > 0
       ? (result['request_duration_ms_sum'] ?? 0) / result['request_duration_ms_count']
       : 0,
-    avgTemplateMs: result['request_template_duration_ms'] ?? 0,
-    avgResourceMs: result['request_resource_duration_ms'] ?? 0,
-    avgScreenshotMs: result['request_screenshot_duration_ms'] ?? 0,
     totalP50: result['request_duration_ms_p50'] ?? 0,
     totalP95: result['request_duration_ms_p95'] ?? 0,
     totalP99: result['request_duration_ms_p99'] ?? 0,
-    templateP50: 0,
-    templateP95: 0,
-    templateP99: 0,
-    resourceP50: 0,
-    resourceP95: 0,
-    resourceP99: 0,
-    screenshotP50: 0,
-    screenshotP95: 0,
-    screenshotP99: 0,
     sampleCount: result['request_requests_total'] ?? 0,
-    nonCacheSampleCount: result['request_cache_misses_total'] ?? 0,
   }
 }
 

@@ -29,22 +29,19 @@ function formatMs(ms: number | null): string {
       <thead>
         <tr class="border-b border-gray-200 dark:border-gray-700">
           <th class="text-left py-3 px-4 font-medium text-gray-500 dark:text-gray-400">时间</th>
-          <th class="text-left py-3 px-4 font-medium text-gray-500 dark:text-gray-400">路径</th>
+          <th class="text-left py-3 px-4 font-medium text-gray-500 dark:text-gray-400">方法+路径</th>
           <th class="text-left py-3 px-4 font-medium text-gray-500 dark:text-gray-400">状态</th>
           <th class="text-left py-3 px-4 font-medium text-gray-500 dark:text-gray-400">耗时</th>
-          <th class="text-left py-3 px-4 font-medium text-gray-500 dark:text-gray-400">模板</th>
-          <th class="text-left py-3 px-4 font-medium text-gray-500 dark:text-gray-400">资源</th>
-          <th class="text-left py-3 px-4 font-medium text-gray-500 dark:text-gray-400">截图</th>
-          <th class="text-left py-3 px-4 font-medium text-gray-500 dark:text-gray-400">缓存</th>
+          <th class="text-left py-3 px-4 font-medium text-gray-500 dark:text-gray-400">IP</th>
           <th class="text-left py-3 px-4 font-medium text-gray-500 dark:text-gray-400">用户</th>
         </tr>
       </thead>
       <tbody>
         <tr v-if="loading">
-          <td colspan="9" class="py-8 text-center text-gray-400 dark:text-gray-500">加载中...</td>
+          <td colspan="6" class="py-8 text-center text-gray-400 dark:text-gray-500">加载中...</td>
         </tr>
         <tr v-else-if="logs.length === 0">
-          <td colspan="9" class="py-8 text-center text-gray-400 dark:text-gray-500">暂无数据</td>
+          <td colspan="6" class="py-8 text-center text-gray-400 dark:text-gray-500">暂无数据</td>
         </tr>
         <tr
           v-for="log in logs"
@@ -55,20 +52,15 @@ function formatMs(ms: number | null): string {
           <td class="py-3 px-4 text-gray-600 dark:text-gray-400 whitespace-nowrap">
             {{ new Date(log.created_at).toLocaleString() }}
           </td>
-          <td class="py-3 px-4 text-gray-900 dark:text-gray-100 font-mono text-xs">{{ log.path }}</td>
+          <td class="py-3 px-4 text-gray-900 dark:text-gray-100 font-mono text-xs">
+            <span class="inline-block px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 font-medium mr-1">{{ log.method }}</span>
+            {{ log.path }}
+          </td>
           <td class="py-3 px-4">
             <span class="font-medium" :class="statusColor(log.status_code)">{{ log.status_code }}</span>
           </td>
           <td class="py-3 px-4 text-gray-600 dark:text-gray-400">{{ formatMs(log.duration_ms) }}</td>
-          <td class="py-3 px-4 text-gray-600 dark:text-gray-400">{{ formatMs(log.template_ms) }}</td>
-          <td class="py-3 px-4 text-gray-600 dark:text-gray-400">{{ formatMs(log.resource_ms) }}</td>
-          <td class="py-3 px-4 text-gray-600 dark:text-gray-400">{{ formatMs(log.screenshot_ms) }}</td>
-          <td class="py-3 px-4">
-            <span
-              class="inline-block px-2 py-0.5 text-xs font-medium rounded-full"
-              :class="log.cache_hit ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'"
-            >{{ log.cache_hit ? 'HIT' : 'MISS' }}</span>
-          </td>
+          <td class="py-3 px-4 text-gray-600 dark:text-gray-400 font-mono text-xs">{{ log.ip_address ?? '-' }}</td>
           <td class="py-3 px-4 text-gray-600 dark:text-gray-400 max-w-[140px] truncate">
             {{ log.user_nickname ?? log.user_email ?? (log.user_id ? '匿名' : '-') }}
           </td>
