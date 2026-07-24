@@ -14,6 +14,7 @@ function loginTypeLabel(type: string | null): string {
     case 'wechat': return '微信'
     case 'email': return '邮箱'
     case 'wechat+email': return '微信 + 邮箱'
+    case 'admin': return '管理员'
     case 'anonymous': return '匿名'
     default: return type ?? '-'
   }
